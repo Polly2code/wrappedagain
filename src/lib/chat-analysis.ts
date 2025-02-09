@@ -1,4 +1,3 @@
-
 import { pipeline } from '@huggingface/transformers';
 
 // Type definitions for sentiment analysis
@@ -90,14 +89,16 @@ const initializeClassifier = async () => {
 
 export const processChat = async (fileContent: string) => {
   try {
-    console.log('Starting chat analysis with content length:', fileContent.length);
+    console.log('Starting chat analysis with content:', fileContent.substring(0, 200) + '...');
     
     if (!fileContent) {
+      console.error('No file content provided');
       throw new Error('No file content provided');
     }
     
     const lines = fileContent.split('\n').filter(line => line.trim() !== '');
-    console.log('Total lines to process:', lines.length);
+    console.log('Total lines found:', lines.length);
+    console.log('First few lines:', lines.slice(0, 3));
     
     const messagePattern = /\[?(\d{1,2}[\.\/]\d{1,2}[\.\/]\d{2,4})[,\s]\s*(\d{1,2}:\d{2}(?::\d{2})?)\]?\s*(?:[-\s])*([^:]+?):\s*(.+)/;
     
@@ -107,14 +108,17 @@ export const processChat = async (fileContent: string) => {
     let failedParses = 0;
     
     for (const line of lines) {
+      console.log('Processing line:', line);
       const match = line.match(messagePattern);
       
       if (!match) {
+        console.log('Failed to match pattern for line:', line);
         failedParses++;
         continue;
       }
       
       const [, datePart, timePart, sender, content] = match;
+      console.log('Matched components:', { datePart, timePart, sender, content });
       
       try {
         const [day, month, yearStr] = datePart.split(/[\.\/]/);
@@ -139,10 +143,16 @@ export const processChat = async (fileContent: string) => {
             has_emoji: /[\p{Emoji}]/u.test(content)
           });
           successfulParses++;
+          console.log('Successfully parsed message:', {
+            sender: sender.trim(),
+            timestamp: timestamp.toISOString()
+          });
         } else {
+          console.error('Invalid timestamp created:', timestamp);
           failedParses++;
         }
       } catch (error) {
+        console.error('Error parsing message:', error);
         failedParses++;
       }
     }
@@ -150,6 +160,7 @@ export const processChat = async (fileContent: string) => {
     console.log(`Parsing complete - Successful: ${successfulParses}, Failed: ${failedParses}`);
     
     if (messages.length === 0) {
+      console.error('No messages could be parsed from the file');
       throw new Error('No messages could be parsed from the file. Please check the file format.');
     }
 
@@ -204,6 +215,6 @@ export const processChat = async (fileContent: string) => {
 
   } catch (error) {
     console.error('Error in chat analysis:', error);
-    throw new Error(`Chat analysis failed: ${error.message}`);
+    throw error;
   }
 };

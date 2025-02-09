@@ -34,21 +34,34 @@ export const FileUpload = () => {
 
     setIsProcessing(true);
     const reader = new FileReader();
+    
     reader.onload = async (e) => {
       const text = e.target?.result;
+      console.log('File content loaded:', (text as string)?.substring(0, 200) + '...');
+      
       if (typeof text === 'string') {
         try {
+          console.log('Starting chat processing...');
           const results = await processChat(text);
+          console.log('Analysis results:', results);
           setAnalysisResults(results);
           setShowResults(true);
           toast.success('Chat analysis completed!');
         } catch (error) {
-          toast.error('Error analyzing chat file');
+          console.error('Error in analysis:', error);
+          toast.error(error instanceof Error ? error.message : 'Error analyzing chat file');
         } finally {
           setIsProcessing(false);
         }
       }
     };
+
+    reader.onerror = (error) => {
+      console.error('Error reading file:', error);
+      toast.error('Error reading file');
+      setIsProcessing(false);
+    };
+
     reader.readAsText(file);
   };
 
