@@ -15,9 +15,19 @@ const AudioPlayer = () => {
 
     script.onload = () => {
       const widget = SC.Widget('soundcloud-player');
+      
       widget.bind(SC.Widget.Events.READY, () => {
+        console.log('SoundCloud player is ready');
+        widget.setVolume(100);
         widget.play();
-        updateMuteState();
+      });
+
+      widget.bind(SC.Widget.Events.PLAY, () => {
+        console.log('Started playing');
+      });
+
+      widget.bind(SC.Widget.Events.ERROR, () => {
+        console.error('SoundCloud player error occurred');
       });
     };
 
@@ -29,11 +39,7 @@ const AudioPlayer = () => {
   const updateMuteState = () => {
     const widget = SC.Widget('soundcloud-player');
     widget.getVolume((volume: number) => {
-      if (isMuted) {
-        widget.setVolume(100);
-      } else {
-        widget.setVolume(0);
-      }
+      widget.setVolume(isMuted ? 0 : 100);
     });
   };
 
@@ -52,7 +58,7 @@ const AudioPlayer = () => {
         scrolling="no"
         frameBorder="no"
         allow="autoplay"
-        src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/fredagain/baby-again&auto_play=true&show_artwork=false&show_comments=false&show_user=false&show_reposts=false&visual=false"
+        src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1519010947&auto_play=true&show_artwork=false&show_comments=false&show_user=false&show_reposts=false&visual=false"
       />
       <Button
         variant="ghost"
