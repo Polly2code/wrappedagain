@@ -9,6 +9,7 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -17,8 +18,14 @@ serve(async (req) => {
     const { messages } = await req.json();
     const messageContent = messages.map(msg => msg.content).join('\n');
     
-    console.log('Analyzing emojis for message content:', messageContent.substring(0, 100) + '...');
+    console.log('Received request with messages:', messages);
+    console.log('OpenAI API Key exists:', !!openAIApiKey);
 
+    if (!openAIApiKey) {
+      throw new Error('OpenAI API key is not configured');
+    }
+
+    console.log('Making request to OpenAI API...');
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -26,7 +33,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4-mini',
+        model: 'gpt-4o-mini', // Fixed model name
         messages: [
           {
             role: 'system',
@@ -44,12 +51,12 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error('OpenAI API error:', errorData);
+      console.error('OpenAI API error response:', errorData);
       throw new Error(`OpenAI API error: ${errorData.error?.message || 'Unknown error'}`);
     }
 
     const data = await response.json();
-    console.log('OpenAI response:', data);
+    console.log('OpenAI API response:', data);
 
     if (!data.choices?.[0]?.message?.content) {
       throw new Error('Invalid response format from OpenAI');
