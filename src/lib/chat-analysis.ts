@@ -1,26 +1,20 @@
 
 import { pipeline } from '@huggingface/transformers';
 
-interface TextClassificationSingle {
+// Type definitions for sentiment analysis
+interface SentimentResult {
   label: string;
   score: number;
 }
 
-interface TextClassificationOutput {
-  results: TextClassificationSingle[];
+interface Message {
+  sender: string;
+  content: string;
+  timestamp: string;
+  has_emoji: boolean;
 }
 
-const handleClassification = (output: any): TextClassificationSingle => {
-  if (Array.isArray(output)) {
-    return output[0];
-  }
-  if ('results' in output) {
-    return output.results[0];
-  }
-  return output;
-};
-
-export const calculateTimeDistribution = (messages: any[]) => {
+export const calculateTimeDistribution = (messages: Message[]) => {
   const distribution: Record<string, number> = {};
   messages.forEach(msg => {
     const hour = new Date(msg.timestamp).getHours();
@@ -29,7 +23,7 @@ export const calculateTimeDistribution = (messages: any[]) => {
   return distribution;
 };
 
-export const calculateDayDistribution = (messages: any[]) => {
+export const calculateDayDistribution = (messages: Message[]) => {
   const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const distribution: Record<string, number> = {};
   messages.forEach(msg => {
@@ -39,7 +33,7 @@ export const calculateDayDistribution = (messages: any[]) => {
   return distribution;
 };
 
-export const calculateEmojiUsage = (messages: any[]) => {
+export const calculateEmojiUsage = (messages: Message[]) => {
   const emojiRegex = /[\p{Emoji}]/gu;
   const emojiCounts: Record<string, number> = {};
   
@@ -56,7 +50,7 @@ export const calculateEmojiUsage = (messages: any[]) => {
     .map(([emoji, count]) => ({ emoji, count }));
 };
 
-export const determineCommunicatorType = (messages: any[]) => {
+export const determineCommunicatorType = (messages: Message[]) => {
   const categories = [
     'The Emoji Enthusiast 🎨',
     'The Night Owl 🦉',
@@ -91,10 +85,11 @@ export const processChat = async (fileContent: string) => {
     const lines = fileContent.split('\n').filter(line => line.trim() !== '');
     console.log('Total lines to process:', lines.length);
     
+    // Updated regex pattern to handle various WhatsApp date/time formats
     const messagePattern = /\[?(\d{1,2}[\.\/]\d{1,2}[\.\/]\d{2,4})[,\s]\s*(\d{1,2}:\d{2}(?::\d{2})?)\]?\s*(?:[-\s])*([^:]+?):\s*(.+)/;
     
     console.log('Starting message parsing...');
-    const messages = [];
+    const messages: Message[] = [];
     let successfulParses = 0;
     let failedParses = 0;
     
@@ -164,7 +159,7 @@ export const processChat = async (fileContent: string) => {
         try {
           const result = await classifier(msg.content);
           console.log('Sentiment result for message:', result);
-          return handleClassification(result);
+          return result[0] as SentimentResult;
         } catch (error) {
           console.error('Error in sentiment analysis:', error);
           return { label: 'NEUTRAL', score: 0.5 };
