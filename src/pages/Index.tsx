@@ -26,9 +26,9 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-[#dcf8c6] to-[#25D366] py-12 px-4">
       <div className="fixed inset-0 flex items-center justify-center pointer-events-none">
-        <div className="relative overflow-hidden w-[200vw] -translate-x-[50%]">
-          <div className="animate-[marquee_20s_linear_infinite] whitespace-nowrap absolute">
-            <span className="inline-block text-[#F4EF53] text-9xl font-bold text-center tracking-wider" style={{ 
+        <div className="relative w-[400vw] overflow-hidden">
+          <div className="absolute w-[400vw] flex animate-[marquee_20s_linear_infinite]">
+            <span className="inline-block w-[100vw] text-[#F4EF53] text-9xl font-bold text-center tracking-wider shrink-0" style={{ 
               fontFamily: 'Orbitron, system-ui',
               fontWeight: '900',
               textShadow: `
@@ -37,7 +37,40 @@ const Index = () => {
               `,
               filter: 'drop-shadow(0 10px 8px rgb(0 0 0 / 0.1))',
             }}>
-              wrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagain
+              wrappedagainwrappedagainwrappedagain
+            </span>
+            <span className="inline-block w-[100vw] text-[#F4EF53] text-9xl font-bold text-center tracking-wider shrink-0" style={{ 
+              fontFamily: 'Orbitron, system-ui',
+              fontWeight: '900',
+              textShadow: `
+                -2px -2px 4px rgba(255, 255, 255, 0.8),
+                2px 2px 8px rgba(0, 0, 0, 0.15)
+              `,
+              filter: 'drop-shadow(0 10px 8px rgb(0 0 0 / 0.1))',
+            }}>
+              wrappedagainwrappedagainwrappedagain
+            </span>
+            <span className="inline-block w-[100vw] text-[#F4EF53] text-9xl font-bold text-center tracking-wider shrink-0" style={{ 
+              fontFamily: 'Orbitron, system-ui',
+              fontWeight: '900',
+              textShadow: `
+                -2px -2px 4px rgba(255, 255, 255, 0.8),
+                2px 2px 8px rgba(0, 0, 0, 0.15)
+              `,
+              filter: 'drop-shadow(0 10px 8px rgb(0 0 0 / 0.1))',
+            }}>
+              wrappedagainwrappedagainwrappedagain
+            </span>
+            <span className="inline-block w-[100vw] text-[#F4EF53] text-9xl font-bold text-center tracking-wider shrink-0" style={{ 
+              fontFamily: 'Orbitron, system-ui',
+              fontWeight: '900',
+              textShadow: `
+                -2px -2px 4px rgba(255, 255, 255, 0.8),
+                2px 2px 8px rgba(0, 0, 0, 0.15)
+              `,
+              filter: 'drop-shadow(0 10px 8px rgb(0 0 0 / 0.1))',
+            }}>
+              wrappedagainwrappedagainwrappedagain
             </span>
           </div>
         </div>
