@@ -14,6 +14,7 @@ export const processChat = async (fileContent: string): Promise<ChatAnalysisResu
     console.log('Starting chat analysis with content:', fileContent.substring(0, 200) + '...');
     
     const messages = parseMessages(fileContent);
+    console.log(`Successfully parsed ${messages.length} messages`);
     
     const basicResults: ChatAnalysisResult = {
       total_messages: messages.length,
@@ -29,7 +30,15 @@ export const processChat = async (fileContent: string): Promise<ChatAnalysisResu
       }
     };
 
-    basicResults.sentiment_analysis = await analyzeSentiment(messages);
+    try {
+      basicResults.sentiment_analysis = await analyzeSentiment(messages);
+    } catch (error) {
+      console.warn('Sentiment analysis failed, using neutral values:', error);
+      basicResults.sentiment_analysis = {
+        positive: 0.5,
+        negative: 0.5
+      };
+    }
 
     console.log('Analysis complete! Results:', basicResults);
     return basicResults;
