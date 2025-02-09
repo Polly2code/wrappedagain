@@ -1,3 +1,4 @@
+
 import { pipeline } from '@huggingface/transformers';
 
 // Type definitions for sentiment analysis
@@ -78,11 +79,16 @@ let classifier: any = null;
 const initializeClassifier = async () => {
   if (!classifier) {
     console.log('Initializing sentiment analysis pipeline...');
-    classifier = await pipeline('sentiment-analysis', 'Xenova/distilbert-base-uncased-finetuned-sst-2-english', {
-      progress_callback: (progress: any) => {
-        console.log('Loading model:', Math.round(progress.progress * 100), '%');
-      }
-    });
+    try {
+      classifier = await pipeline('sentiment-analysis', 'Xenova/distilbert-base-uncased-finetuned-sst-2-english', {
+        progress_callback: (progress: any) => {
+          console.log('Loading model:', Math.round(progress.progress * 100), '%');
+        }
+      });
+    } catch (error) {
+      console.error('Error initializing classifier:', error);
+      throw new Error('Failed to initialize sentiment analysis model');
+    }
   }
   return classifier;
 };
@@ -98,27 +104,27 @@ export const processChat = async (fileContent: string) => {
     
     const lines = fileContent.split('\n').filter(line => line.trim() !== '');
     console.log('Total lines found:', lines.length);
-    console.log('First few lines:', lines.slice(0, 3));
+    
+    // Limit the number of lines to process to prevent browser hanging
+    const maxLines = 1000;
+    const processedLines = lines.slice(0, maxLines);
+    console.log('Processing first', processedLines.length, 'lines');
     
     const messagePattern = /\[?(\d{1,2}[\.\/]\d{1,2}[\.\/]\d{2,4})[,\s]\s*(\d{1,2}:\d{2}(?::\d{2})?)\]?\s*(?:[-\s])*([^:]+?):\s*(.+)/;
     
-    console.log('Starting message parsing...');
     const messages: Message[] = [];
     let successfulParses = 0;
     let failedParses = 0;
     
-    for (const line of lines) {
-      console.log('Processing line:', line);
+    for (const line of processedLines) {
       const match = line.match(messagePattern);
       
       if (!match) {
-        console.log('Failed to match pattern for line:', line);
         failedParses++;
         continue;
       }
       
       const [, datePart, timePart, sender, content] = match;
-      console.log('Matched components:', { datePart, timePart, sender, content });
       
       try {
         const [day, month, yearStr] = datePart.split(/[\.\/]/);
@@ -143,16 +149,10 @@ export const processChat = async (fileContent: string) => {
             has_emoji: /[\p{Emoji}]/u.test(content)
           });
           successfulParses++;
-          console.log('Successfully parsed message:', {
-            sender: sender.trim(),
-            timestamp: timestamp.toISOString()
-          });
         } else {
-          console.error('Invalid timestamp created:', timestamp);
           failedParses++;
         }
       } catch (error) {
-        console.error('Error parsing message:', error);
         failedParses++;
       }
     }
@@ -160,7 +160,6 @@ export const processChat = async (fileContent: string) => {
     console.log(`Parsing complete - Successful: ${successfulParses}, Failed: ${failedParses}`);
     
     if (messages.length === 0) {
-      console.error('No messages could be parsed from the file');
       throw new Error('No messages could be parsed from the file. Please check the file format.');
     }
 
@@ -178,6 +177,7 @@ export const processChat = async (fileContent: string) => {
       }
     };
 
+    // Analyze only a small sample for sentiment
     const sampleSize = Math.min(20, messages.length);
     console.log(`Performing sentiment analysis on ${sampleSize} messages...`);
 
