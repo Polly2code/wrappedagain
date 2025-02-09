@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { DropZone } from './chat-analysis/DropZone';
 import { AnalysisResults } from './chat-analysis/AnalysisResults';
@@ -15,7 +15,11 @@ export const FileUpload = () => {
 
   const handleSubmit = async () => {
     if (!file) {
-      toast.error('Please select a file first');
+      toast({
+        title: "Error",
+        description: 'Please select a file first',
+        className: "bg-transparent border-red-500",
+      });
       return;
     }
 
@@ -33,10 +37,18 @@ export const FileUpload = () => {
           console.log('Analysis results:', results);
           setAnalysisResults(results);
           setShowResults(true);
-          toast.success('Chat analysis completed!');
+          toast({
+            title: "Success",
+            description: 'Chat analysis completed!',
+            className: "bg-transparent border-primary",
+          });
         } catch (error) {
           console.error('Error in analysis:', error);
-          toast.error(error instanceof Error ? error.message : 'Error analyzing chat file');
+          toast({
+            title: "Error",
+            description: error instanceof Error ? error.message : 'Error analyzing chat file',
+            className: "bg-transparent border-red-500",
+          });
         } finally {
           setIsProcessing(false);
         }
@@ -45,7 +57,11 @@ export const FileUpload = () => {
 
     reader.onerror = (error) => {
       console.error('Error reading file:', error);
-      toast.error('Error reading file');
+      toast({
+        title: "Error",
+        description: 'Error reading file',
+        className: "bg-transparent border-red-500",
+      });
       setIsProcessing(false);
     };
 
