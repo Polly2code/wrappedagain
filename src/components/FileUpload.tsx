@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Upload, FileText } from 'lucide-react';
@@ -21,7 +20,7 @@ export const FileUpload = () => {
           file_name: file?.name,
           upload_date: new Date().toISOString(),
         }])
-        .select()
+        .select('*')
         .single();
 
       if (uploadError) {
@@ -57,7 +56,8 @@ export const FileUpload = () => {
         const batch = messages.slice(i, i + batchSize);
         const { error: messagesError } = await supabase
           .from('messages')
-          .insert(batch);
+          .insert(batch)
+          .select();
 
         if (messagesError) {
           console.error(`Error inserting messages batch ${i}:`, messagesError);
@@ -85,7 +85,8 @@ export const FileUpload = () => {
       // Insert analysis results
       const { error: analysisError } = await supabase
         .from('analysis_results')
-        .insert([analysis]);
+        .insert([analysis])
+        .select();
 
       if (analysisError) {
         console.error('Error inserting analysis:', analysisError);
@@ -95,7 +96,6 @@ export const FileUpload = () => {
 
       console.log('Analysis results uploaded successfully');
       toast.success('Chat analysis completed!');
-      // Here you would typically redirect to the analysis results page
     } catch (error) {
       console.error('Error processing chat:', error);
       toast.error('Error processing chat file');
