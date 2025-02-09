@@ -1,4 +1,6 @@
+
 import { Message } from './types/chat';
+import { supabase } from '@/integrations/supabase/client';
 
 export const calculateTimeDistribution = (messages: Message[]) => {
   const distribution: Record<string, number> = {};
@@ -21,20 +23,16 @@ export const calculateDayDistribution = (messages: Message[]) => {
 
 export const calculateEmojiUsage = async (messages: Message[]) => {
   try {
-    const response = await fetch('/functions/v1/analyze-emojis', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ messages }),
+    const { data, error } = await supabase.functions.invoke('analyze-emojis', {
+      body: { messages },
     });
 
-    if (!response.ok) {
-      console.error('Error analyzing emojis:', await response.text());
+    if (error) {
+      console.error('Error analyzing emojis:', error);
       return [];
     }
 
-    return await response.json();
+    return data;
   } catch (error) {
     console.error('Error calling emoji analysis:', error);
     return [];
