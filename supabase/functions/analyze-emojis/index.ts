@@ -16,14 +16,23 @@ serve(async (req) => {
   }
 
   try {
-    const { messages } = await req.json();
+    const { messages, analysis_type = 'emoji' } = await req.json();
     const messageContent = messages.map(msg => msg.content).join('\n');
     
     console.log('Received request with messages:', messages);
+    console.log('Analysis type:', analysis_type);
     console.log('OpenAI API Key exists:', !!openAIApiKey);
 
     if (!openAIApiKey) {
       throw new Error('OpenAI API key is not configured');
+    }
+
+    let systemPrompt;
+    if (analysis_type === 'communication_style') {
+      const senders = [...new Set(messages.map(msg => msg.sender))];
+      systemPrompt = `You are a chat style analyzer. Given chat messages, analyze the communication style of each participant. Evaluate aspects like formality, emoji usage, message length, response time, and conversation patterns. Return a JSON object with 'communication_styles' containing communication style descriptions for each participant, like {"communication_styles": {"${senders[0]}": "The Professional Communicator 👔: Uses formal language, responds promptly", "${senders[1]}": "The Emoji Enthusiast 🎨: Expressive and visual communication style"}}`;
+    } else {
+      systemPrompt = 'You are an emoji analyzer. Given chat messages, extract and count the most frequently used emojis. Return exactly 5 emojis with their counts in JSON format like [{"emoji": "😊", "count": 5}]. If there are fewer than 5 emojis, include all found emojis. If no emojis are found, return an empty array.';
     }
 
     const requestBody = {
@@ -31,7 +40,7 @@ serve(async (req) => {
       messages: [
         {
           role: 'system',
-          content: 'You are an emoji analyzer. Given chat messages, extract and count the most frequently used emojis. Return exactly 5 emojis with their counts in JSON format like [{"emoji": "😊", "count": 5}]. If there are fewer than 5 emojis, include all found emojis. If no emojis are found, return an empty array.'
+          content: systemPrompt
         },
         {
           role: 'user',
@@ -69,14 +78,14 @@ serve(async (req) => {
       throw new Error('Invalid response format from Langdock');
     }
 
-    const emojiAnalysis = JSON.parse(data.choices[0].message.content);
-    console.log('Parsed emoji analysis:', emojiAnalysis);
+    const analysisResult = JSON.parse(data.choices[0].message.content);
+    console.log('Parsed analysis result:', analysisResult);
 
-    return new Response(JSON.stringify(emojiAnalysis), {
+    return new Response(JSON.stringify(analysisResult), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    console.error('Error in emoji analysis:', error);
+    console.error('Error in analysis:', error);
     return new Response(JSON.stringify({ 
       error: error.message,
       status: 'error'

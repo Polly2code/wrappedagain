@@ -21,7 +21,7 @@ export interface AnalysisResultsProps {
       positive: number;
       negative: number;
     };
-    communicator_type: string;
+    communication_styles: Record<string, string>;
   } | null;
 }
 
@@ -43,8 +43,13 @@ export const AnalysisResults = ({ showResults, setShowResults, analysisResults }
           </div>
 
           <div className="space-y-2">
-            <h3 className="font-semibold">Communication Style</h3>
-            <p className="text-lg">{analysisResults.communicator_type}</p>
+            <h3 className="font-semibold">Communication Styles</h3>
+            {Object.entries(analysisResults.communication_styles || {}).map(([participant, style]) => (
+              <div key={participant} className="bg-gray-50 p-3 rounded-lg">
+                <p className="font-medium">{participant}</p>
+                <p className="text-gray-600">{style}</p>
+              </div>
+            ))}
           </div>
 
           {analysisResults.top_emojis.length > 0 && (

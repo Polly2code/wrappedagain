@@ -39,26 +39,20 @@ export const calculateEmojiUsage = async (messages: Message[]) => {
   }
 };
 
-export const determineCommunicatorType = (messages: Message[]) => {
-  const categories = [
-    'The Emoji Enthusiast 🎨',
-    'The Night Owl 🦉',
-    'The Morning Person ☀️',
-    'The Conversation Master 🎭',
-    'The Brief & Bold ⚡',
-    'The Storyteller 📚'
-  ];
-  
-  const userMessages = messages.filter(m => m.sender === messages[0].sender);
-  const hasLotsOfEmojis = userMessages.some(m => (m.content.match(/[\p{Emoji}]/gu) || []).length > 3);
-  const avgMessageLength = userMessages.reduce((acc, m) => acc + m.content.length, 0) / userMessages.length;
-  const nightMessages = userMessages.filter(m => new Date(m.timestamp).getHours() >= 22).length;
-  const morningMessages = userMessages.filter(m => new Date(m.timestamp).getHours() <= 6).length;
-  
-  if (hasLotsOfEmojis) return categories[0];
-  if (nightMessages > userMessages.length * 0.3) return categories[1];
-  if (morningMessages > userMessages.length * 0.3) return categories[2];
-  if (userMessages.length > messages.length * 0.6) return categories[3];
-  if (avgMessageLength < 10) return categories[4];
-  return categories[5];
+export const determineCommunicatorType = async (messages: Message[]) => {
+  try {
+    const { data, error } = await supabase.functions.invoke('analyze-emojis', {
+      body: { messages, analysis_type: 'communication_style' },
+    });
+
+    if (error) {
+      console.error('Error analyzing communication style:', error);
+      return 'The Casual Conversationalist 💬';
+    }
+
+    return data.communication_styles;
+  } catch (error) {
+    console.error('Error calling communication style analysis:', error);
+    return 'The Casual Conversationalist 💬';
+  }
 };
