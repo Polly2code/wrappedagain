@@ -29,13 +29,14 @@ serve(async (req) => {
     let systemPrompt;
     if (analysis_type === 'communication_style') {
       const senders = [...new Set(messages.map(msg => msg.sender))];
-      systemPrompt = `Analyze the communication style of each participant in this chat. Return a simple JSON object with communication styles. The response should be in this exact format without any markdown or code blocks: {"communication_styles":{"${senders[0]}":"Brief description of style","${senders[1]}":"Brief description of style"}}`;
+      const participantsStr = senders.map(s => `"${s}"`).join(',');
+      systemPrompt = `Analyze the communication style of each participant in this chat. There may be multiple participants. Return a simple JSON object with communication styles. The response must be in this exact format without any markdown or code blocks: {"communication_styles":{${participantsStr}:"Brief description of style"}}`;
     } else {
       systemPrompt = 'Extract and count emojis from the chat. Return a simple JSON array without any markdown or code blocks, like: [{"emoji":"😊","count":5}]. Return exactly 5 emojis with their counts. If fewer emojis exist, return all found. If no emojis found, return empty array.';
     }
 
     const requestBody = {
-      model: 'gpt-4o',
+      model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',
@@ -50,7 +51,7 @@ serve(async (req) => {
       max_tokens: 150
     };
 
-    console.log('Making request to Langdock API with body:', JSON.stringify(requestBody));
+    console.log('Making request to OpenAI API with body:', JSON.stringify(requestBody));
     
     const response = await fetch('https://api.langdock.com/openai/us/v1/chat/completions', {
       method: 'POST',
@@ -63,18 +64,18 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorData = await response.text();
-      console.error('Langdock API error response:', errorData);
+      console.error('OpenAI API error response:', errorData);
       console.error('Response status:', response.status);
       console.error('Response headers:', Object.fromEntries(response.headers.entries()));
-      throw new Error(`Langdock API error (${response.status}): ${errorData}`);
+      throw new Error(`OpenAI API error (${response.status}): ${errorData}`);
     }
 
     const data = await response.json();
-    console.log('Langdock API response:', data);
+    console.log('OpenAI API response:', data);
 
     if (!data.choices?.[0]?.message?.content) {
       console.error('Invalid response format:', data);
-      throw new Error('Invalid response format from Langdock');
+      throw new Error('Invalid response format from OpenAI');
     }
 
     // Clean up the response by removing any markdown code block syntax

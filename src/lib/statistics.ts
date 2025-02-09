@@ -47,19 +47,19 @@ export const determineCommunicatorType = async (messages: Message[]): Promise<Re
 
     if (error) {
       console.error('Error analyzing communication style:', error);
-      return {
-        [messages[0].sender]: 'The Casual Conversationalist 💬',
-        [messages.find(m => m.sender !== messages[0].sender)?.sender || 'Other']: 'The Casual Conversationalist 💬'
-      };
+      return generateDefaultStyles(messages);
     }
 
     return data.communication_styles;
   } catch (error) {
     console.error('Error calling communication style analysis:', error);
-    return {
-      [messages[0].sender]: 'The Casual Conversationalist 💬',
-      [messages.find(m => m.sender !== messages[0].sender)?.sender || 'Other']: 'The Casual Conversationalist 💬'
-    };
+    return generateDefaultStyles(messages);
   }
 };
 
+const generateDefaultStyles = (messages: Message[]): Record<string, string> => {
+  const uniqueSenders = [...new Set(messages.map(m => m.sender))];
+  return Object.fromEntries(
+    uniqueSenders.map(sender => [sender, 'The Casual Conversationalist 💬'])
+  );
+};
