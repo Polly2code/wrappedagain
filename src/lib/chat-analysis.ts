@@ -63,79 +63,95 @@ export const determineCommunicatorType = (messages: any[]) => {
 
 export const processChat = async (fileContent: string) => {
   try {
-    console.log('Starting chat analysis...');
+    console.log('Starting chat analysis with content length:', fileContent.length);
+    
+    if (!fileContent) {
+      throw new Error('No file content provided');
+    }
     
     const lines = fileContent.split('\n').filter(line => line.trim() !== '');
     console.log('Total lines to process:', lines.length);
     
-    const messagePattern = /^\[?(\d{1,2}[\.\/]\d{1,2}[\.\/]\d{2,4})[,\s]\s*(\d{1,2}:\d{2}(?::\d{2})?)\]?\s*(?:[-\s:])*\s*([^:]+?):\s*(.+)$/;
+    // More specific regex pattern for WhatsApp chat format
+    const messagePattern = /\[?(\d{1,2}[\.\/]\d{1,2}[\.\/]\d{2,4})[,\s]\s*(\d{1,2}:\d{2}(?::\d{2})?)\]?\s*(?:[-\s])*([^:]+?):\s*(.+)/;
     
-    console.log('Parsing messages...');
+    console.log('Starting message parsing...');
     const messages = [];
+    let successfulParses = 0;
+    let failedParses = 0;
     
-    for (let i = 0; i < lines.length; i++) {
-      if (i % 1000 === 0) {
-        console.log(`Processing messages: ${i}/${lines.length}`);
-      }
-
-      const line = lines[i];
+    for (const line of lines) {
       const match = line.match(messagePattern);
       
-      if (!match) continue;
+      if (!match) {
+        failedParses++;
+        console.log('Failed to parse line:', line);
+        continue;
+      }
       
       const [, datePart, timePart, sender, content] = match;
       
       try {
-        const dateComponents = datePart.split(/[\.\/]/);
-        const day = parseInt(dateComponents[0]);
-        const month = parseInt(dateComponents[1]) - 1;
-        let year = parseInt(dateComponents[2]);
-        if (year < 100) year += 2000;
+        // Parse date parts
+        const [day, month, yearStr] = datePart.split(/[\.\/]/);
+        const year = yearStr.length === 2 ? '20' + yearStr : yearStr;
         
-        const timeComponents = timePart.split(':');
-        const hours = parseInt(timeComponents[0]);
-        const minutes = parseInt(timeComponents[1]);
-        const seconds = timeComponents[2] ? parseInt(timeComponents[2]) : 0;
+        // Parse time parts
+        const [hours, minutes, seconds = '00'] = timePart.split(':');
         
-        const date = new Date(year, month, day, hours, minutes, seconds);
+        const timestamp = new Date(
+          parseInt(year),
+          parseInt(month) - 1,
+          parseInt(day),
+          parseInt(hours),
+          parseInt(minutes),
+          parseInt(seconds)
+        );
         
-        if (!isNaN(date.getTime())) {
+        if (!isNaN(timestamp.getTime())) {
           messages.push({
             sender: sender.trim(),
             content: content.trim(),
-            timestamp: date.toISOString(),
+            timestamp: timestamp.toISOString(),
             has_emoji: /[\p{Emoji}]/u.test(content)
           });
+          successfulParses++;
+        } else {
+          failedParses++;
+          console.log('Invalid date created for line:', line);
         }
       } catch (error) {
-        continue;
+        failedParses++;
+        console.error('Error parsing date/time:', error, 'for line:', line);
       }
     }
 
-    console.log(`Successfully parsed ${messages.length} messages`);
+    console.log(`Parsing complete - Successful: ${successfulParses}, Failed: ${failedParses}`);
     
     if (messages.length === 0) {
-      throw new Error('No messages could be parsed from the file');
+      throw new Error('No messages could be parsed from the file. Please check the file format.');
     }
 
+    // Reduce sample size to improve performance
     const sampleSize = Math.min(20, messages.length);
     console.log(`Performing sentiment analysis on ${sampleSize} messages...`);
 
+    console.log('Initializing sentiment analysis pipeline...');
     const classifier = await pipeline('sentiment-analysis', 'Xenova/distilbert-base-uncased-finetuned-sst-2-english');
     
     const sampleMessages = messages
       .sort(() => 0.5 - Math.random())
       .slice(0, sampleSize);
 
-    type SentimentResult = { label: string; score: number; };
-    
+    console.log('Running sentiment analysis...');
     const sentiments = await Promise.all(
       sampleMessages.map(async (msg) => {
         try {
           const result = await classifier(msg.content);
-          const sentimentResult = Array.isArray(result) ? result[0] : result;
-          return sentimentResult as SentimentResult;
+          console.log('Sentiment result for message:', result);
+          return Array.isArray(result) ? result[0] : result;
         } catch (error) {
+          console.error('Error in sentiment analysis:', error);
           return { label: 'NEUTRAL', score: 0.5 };
         }
       })
@@ -156,11 +172,11 @@ export const processChat = async (fileContent: string) => {
       communicator_type: determineCommunicatorType(messages),
     };
 
-    console.log('Analysis complete!');
+    console.log('Analysis complete! Results:', results);
     return results;
 
   } catch (error) {
-    console.error('Error processing chat:', error);
-    throw error;
+    console.error('Error in chat analysis:', error);
+    throw new Error(`Chat analysis failed: ${error.message}`);
   }
 };
