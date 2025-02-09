@@ -40,11 +40,13 @@ export const DropZone = ({ file, isProcessing, setFile }: DropZoneProps) => {
     >
       <input {...getInputProps()} />
       <div className="flex flex-col items-center gap-4 text-center">
-        <div className="p-4 rounded-full bg-primary/10">
+        <div className="p-4 rounded-full bg-primary/10 w-20 h-20 flex items-center justify-center">
           {isProcessing ? (
-            <div className="animate-spin">
-              <Upload className="w-8 h-8 text-primary" />
-            </div>
+            <img 
+              src="/party_animal.gif" 
+              alt="Processing" 
+              className="w-full h-full object-cover rounded-full"
+            />
           ) : file ? (
             <FileText className="w-8 h-8 text-primary" />
           ) : (
