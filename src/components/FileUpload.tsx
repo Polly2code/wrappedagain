@@ -53,7 +53,7 @@ export const FileUpload = () => {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto space-y-4 text-[#F4EF53]">
+    <div className="w-full max-w-md mx-auto space-y-4">
       <DropZone 
         file={file}
         isProcessing={isProcessing}
@@ -63,7 +63,7 @@ export const FileUpload = () => {
       <Button 
         onClick={handleSubmit}
         disabled={!file || isProcessing}
-        className="w-full bg-[#F4EF53] text-[#1A1F2C] hover:bg-[#F4EF53]/90"
+        className="w-full"
       >
         {isProcessing ? 'Analyzing...' : 'Analyze Chat'}
       </Button>
