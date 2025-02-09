@@ -17,15 +17,17 @@ export const FileUpload = () => {
       // Upload chat metadata
       const { data: uploadData, error: uploadError } = await supabase
         .from('chat_uploads')
-        .insert({
+        .insert([{
           file_name: file?.name,
-        })
+          upload_date: new Date().toISOString(),
+        }])
         .select()
         .single();
 
       if (uploadError) {
         console.error('Error uploading chat metadata:', uploadError);
-        throw uploadError;
+        toast.error('Failed to upload chat metadata');
+        return;
       }
 
       console.log('Chat metadata uploaded successfully:', uploadData);
@@ -37,25 +39,31 @@ export const FileUpload = () => {
         .filter(line => messagePattern.test(line))
         .map(line => {
           const [, timestamp, sender, content] = line.match(messagePattern) || [];
+          const date = timestamp.replace(/(\d{2})\/(\d{2})\/(\d{2})/, '20$3-$2-$1');
           return {
             chat_upload_id: uploadData.id,
             sender,
             content,
-            timestamp: new Date(timestamp.replace(/(\d{2})\/(\d{2})\/(\d{2})/, '20$3-$2-$1')),
+            timestamp: new Date(date).toISOString(),
             has_emoji: /[\p{Emoji}]/u.test(content),
           };
         });
 
       console.log(`Processing ${messages.length} messages...`);
 
-      // Insert messages
-      const { error: messagesError } = await supabase
-        .from('messages')
-        .insert(messages);
+      // Insert messages in smaller batches to avoid payload size limits
+      const batchSize = 100;
+      for (let i = 0; i < messages.length; i += batchSize) {
+        const batch = messages.slice(i, i + batchSize);
+        const { error: messagesError } = await supabase
+          .from('messages')
+          .insert(batch);
 
-      if (messagesError) {
-        console.error('Error inserting messages:', messagesError);
-        throw messagesError;
+        if (messagesError) {
+          console.error(`Error inserting messages batch ${i}:`, messagesError);
+          toast.error('Failed to insert messages');
+          return;
+        }
       }
 
       console.log('Messages inserted successfully');
@@ -77,11 +85,12 @@ export const FileUpload = () => {
       // Insert analysis results
       const { error: analysisError } = await supabase
         .from('analysis_results')
-        .insert(analysis);
+        .insert([analysis]);
 
       if (analysisError) {
         console.error('Error inserting analysis:', analysisError);
-        throw analysisError;
+        toast.error('Failed to save analysis results');
+        return;
       }
 
       console.log('Analysis results uploaded successfully');
