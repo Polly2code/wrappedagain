@@ -1,10 +1,21 @@
 
 import { pipeline } from '@huggingface/transformers';
 
-interface TextClassificationResult {
+interface TextClassificationSingle {
   label: string;
   score: number;
 }
+
+interface TextClassificationOutput {
+  results: TextClassificationSingle[];
+}
+
+const handleClassification = (output: TextClassificationOutput | TextClassificationSingle): TextClassificationSingle => {
+  if ('results' in output) {
+    return output.results[0];
+  }
+  return output;
+};
 
 export const calculateTimeDistribution = (messages: any[]) => {
   const distribution: Record<string, number> = {};
@@ -150,11 +161,7 @@ export const processChat = async (fileContent: string) => {
         try {
           const result = await classifier(msg.content);
           console.log('Sentiment result for message:', result);
-          const output = Array.isArray(result) ? result[0] : result as TextClassificationResult;
-          return {
-            label: output.label || 'NEUTRAL',
-            score: output.score || 0.5
-          };
+          return handleClassification(result);
         } catch (error) {
           console.error('Error in sentiment analysis:', error);
           return { label: 'NEUTRAL', score: 0.5 };
