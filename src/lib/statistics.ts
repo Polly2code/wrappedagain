@@ -20,21 +20,26 @@ export const calculateDayDistribution = (messages: Message[]) => {
   return distribution;
 };
 
-export const calculateEmojiUsage = (messages: Message[]) => {
-  // More comprehensive emoji regex pattern
-  const emojiRegex = /[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F000}-\u{1F02F}\u{1F0A0}-\u{1F0FF}\u{1F100}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F900}-\u{1F9FF}]/gu;
-  const emojiCounts: Record<string, number> = {};
-  
-  messages.forEach(msg => {
-    const matches = msg.content.match(emojiRegex) || [];
-    matches.forEach(emoji => {
-      emojiCounts[emoji] = (emojiCounts[emoji] || 0) + 1;
+export const calculateEmojiUsage = async (messages: Message[]) => {
+  try {
+    const response = await fetch('/functions/v1/analyze-emojis', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ messages }),
     });
-  });
 
-  return Object.entries(emojiCounts)
-    .sort(([, a], [, b]) => b - a)
-    .map(([emoji, count]) => ({ emoji, count }));
+    if (!response.ok) {
+      console.error('Error analyzing emojis:', await response.text());
+      return [];
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error calling emoji analysis:', error);
+    return [];
+  }
 };
 
 export const determineCommunicatorType = (messages: Message[]) => {
