@@ -65,58 +65,69 @@ export const processChat = async (fileContent: string) => {
   try {
     console.log('Starting chat analysis...');
     
-    // Parse messages - Updated regex pattern to match WhatsApp format more reliably
-    const lines = fileContent.split('\n');
-    const messagePattern = /\[?(\d{1,2}\/\d{1,2}\/\d{2,4},?\s*\d{1,2}:\d{2}(?::\d{2})?(?:\s*[AaPp][Mm])?)\]?\s*[-:]?\s*([^:]+?):\s*(.*)/;
+    // Split the content into lines and filter out empty lines
+    const lines = fileContent.split('\n').filter(line => line.trim() !== '');
+    console.log('Total lines:', lines.length);
+    
+    // Updated regex pattern to match more WhatsApp formats
+    const messagePattern = /^\[?(\d{1,2}\/\d{1,2}\/(?:\d{2}|\d{4}))(?:,|\s)\s*(\d{1,2}:\d{2}(?::\d{2})?(?:\s*[AaPp][Mm])?)\]?\s*(?:[-\s:])*\s*([^:]+?):\s*(.+)$/;
     
     const messages = lines
-      .filter(line => {
-        const isValid = messagePattern.test(line);
-        if (!isValid && line.trim().length > 0) {
-          console.log('Non-matching line:', line);
-        }
-        return isValid;
-      })
       .map(line => {
         const match = line.match(messagePattern);
-        if (!match) return null;
+        if (!match) {
+          console.log('Non-matching line:', line);
+          return null;
+        }
         
-        const [, timestamp, sender, content] = match;
+        const [, datePart, timePart, sender, content] = match;
         
-        // Convert various date formats to ISO string
-        let date = new Date();
         try {
-          // Try parsing the date directly
-          const [datePart, timePart] = timestamp.split(',');
-          const [day, month, year] = datePart.split('/');
-          const fullYear = year.length === 2 ? '20' + year : year;
-          const timeComponents = timePart.trim().split(':');
-          const hours = parseInt(timeComponents[0]);
-          const minutes = parseInt(timeComponents[1]);
-          const seconds = timeComponents[2] ? parseInt(timeComponents[2]) : 0;
+          // Parse date
+          const [day, month, yearStr] = datePart.split('/');
+          const year = yearStr.length === 2 ? '20' + yearStr : yearStr;
           
-          date = new Date(
-            parseInt(fullYear),
+          // Parse time
+          const timeMatch = timePart.match(/(\d{1,2}):(\d{2})(?::(\d{2})?)?(?:\s*([AaPp][Mm])?)?/);
+          if (!timeMatch) throw new Error('Invalid time format');
+          
+          let [, hours, minutes, seconds = '0', meridian] = timeMatch;
+          
+          // Handle 12-hour format if present
+          if (meridian) {
+            let hr = parseInt(hours);
+            if (meridian.toLowerCase() === 'pm' && hr < 12) hr += 12;
+            if (meridian.toLowerCase() === 'am' && hr === 12) hr = 0;
+            hours = hr.toString();
+          }
+          
+          const date = new Date(
+            parseInt(year),
             parseInt(month) - 1,
             parseInt(day),
-            hours,
-            minutes,
-            seconds
+            parseInt(hours),
+            parseInt(minutes),
+            parseInt(seconds)
           );
+          
+          if (isNaN(date.getTime())) {
+            throw new Error('Invalid date');
+          }
+          
+          return {
+            sender: sender.trim(),
+            content: content.trim(),
+            timestamp: date.toISOString(),
+            has_emoji: /[\p{Emoji}]/u.test(content),
+          };
         } catch (error) {
-          console.error('Error parsing date:', timestamp, error);
+          console.error('Error parsing message:', { datePart, timePart, error });
+          return null;
         }
-
-        return {
-          sender: sender.trim(),
-          content: content.trim(),
-          timestamp: date.toISOString(),
-          has_emoji: /[\p{Emoji}]/u.test(content),
-        };
       })
       .filter((msg): msg is NonNullable<typeof msg> => msg !== null);
 
-    console.log(`Processing ${messages.length} messages...`);
+    console.log(`Successfully parsed ${messages.length} messages`);
 
     // Initialize sentiment analysis pipeline
     const classifier = await pipeline('sentiment-analysis', 'Xenova/distilbert-base-uncased-finetuned-sst-2-english');
@@ -142,7 +153,7 @@ export const processChat = async (fileContent: string) => {
       })
     );
 
-    return {
+    const results = {
       total_messages: messages.length,
       messages_sent: messages.filter(m => m.sender === messages[0].sender).length,
       messages_received: messages.filter(m => m.sender !== messages[0].sender).length,
@@ -155,6 +166,10 @@ export const processChat = async (fileContent: string) => {
       },
       communicator_type: determineCommunicatorType(messages),
     };
+
+    console.log('Analysis results:', results);
+    return results;
+
   } catch (error) {
     console.error('Error processing chat:', error);
     throw error;
