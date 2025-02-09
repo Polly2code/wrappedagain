@@ -26,40 +26,46 @@ serve(async (req) => {
       throw new Error('OpenAI API key is not configured');
     }
 
-    console.log('Making request to Langdock API...');
+    const requestBody = {
+      model: 'gpt-4o-mini',
+      messages: [
+        {
+          role: 'system',
+          content: 'You are an emoji analyzer. Given chat messages, extract and count the most frequently used emojis. Return exactly 5 emojis with their counts in JSON format like [{"emoji": "😊", "count": 5}]. If there are fewer than 5 emojis, include all found emojis. If no emojis are found, return an empty array.'
+        },
+        {
+          role: 'user',
+          content: messageContent
+        }
+      ],
+      temperature: 0.7,
+      max_tokens: 150
+    };
+
+    console.log('Making request to Langdock API with body:', JSON.stringify(requestBody));
+    
     const response = await fetch('https://api.langdock.com/openai/us/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${openAIApiKey}`
       },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are an emoji analyzer. Given chat messages, extract and count the most frequently used emojis. Return exactly 5 emojis with their counts in JSON format like [{"emoji": "😊", "count": 5}]. If there are fewer than 5 emojis, include all found emojis. If no emojis are found, return an empty array.'
-          },
-          {
-            role: 'user',
-            content: messageContent
-          }
-        ],
-        temperature: 0.7,
-        max_tokens: 150
-      }),
+      body: JSON.stringify(requestBody)
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = await response.text();
       console.error('Langdock API error response:', errorData);
-      throw new Error(`Langdock API error: ${errorData.error?.message || 'Unknown error'}`);
+      console.error('Response status:', response.status);
+      console.error('Response headers:', Object.fromEntries(response.headers.entries()));
+      throw new Error(`Langdock API error (${response.status}): ${errorData}`);
     }
 
     const data = await response.json();
     console.log('Langdock API response:', data);
 
     if (!data.choices?.[0]?.message?.content) {
+      console.error('Invalid response format:', data);
       throw new Error('Invalid response format from Langdock');
     }
 
