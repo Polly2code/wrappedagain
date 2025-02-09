@@ -1,3 +1,4 @@
+
 import { pipeline } from '@huggingface/transformers';
 
 export const calculateTimeDistribution = (messages: any[]) => {
