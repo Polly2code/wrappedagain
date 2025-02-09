@@ -4,10 +4,32 @@ import { Upload, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { pipeline } from '@huggingface/transformers';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
+type AnalysisResults = {
+  total_messages: number;
+  messages_sent: number;
+  messages_received: number;
+  time_distribution: Record<string, number>;
+  day_distribution: Record<string, number>;
+  top_emojis: Array<{ emoji: string; count: number }>;
+  sentiment_analysis: {
+    positive: number;
+    negative: number;
+  };
+  communicator_type: string;
+};
 
 export const FileUpload = () => {
   const [file, setFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [analysisResults, setAnalysisResults] = useState<AnalysisResults | null>(null);
+  const [showResults, setShowResults] = useState(false);
 
   const processChat = async (fileContent: string) => {
     try {
@@ -67,6 +89,8 @@ export const FileUpload = () => {
       };
 
       console.log('Analysis results:', analysis);
+      setAnalysisResults(analysis);
+      setShowResults(true);
       toast.success('Chat analysis completed!');
       
     } catch (error) {
@@ -112,59 +136,120 @@ export const FileUpload = () => {
     maxFiles: 1
   });
 
+  const formatPercentage = (value: number) => {
+    return `${(value * 100).toFixed(1)}%`;
+  };
+
   return (
-    <div className="w-full max-w-md mx-auto space-y-4">
-      <div
-        {...getRootProps()}
-        className={`p-8 border-2 border-dashed rounded-xl transition-all duration-200 ease-in-out animate-fade-up
-          ${isDragActive 
-            ? 'border-primary bg-primary/5' 
-            : 'border-gray-300 hover:border-primary/50 hover:bg-gray-50'
-          }`}
-      >
-        <input {...getInputProps()} />
-        <div className="flex flex-col items-center gap-4 text-center">
-          <div className="p-4 rounded-full bg-primary/10">
-            {isProcessing ? (
-              <div className="animate-spin">
+    <>
+      <div className="w-full max-w-md mx-auto space-y-4">
+        <div
+          {...getRootProps()}
+          className={`p-8 border-2 border-dashed rounded-xl transition-all duration-200 ease-in-out animate-fade-up
+            ${isDragActive 
+              ? 'border-primary bg-primary/5' 
+              : 'border-gray-300 hover:border-primary/50 hover:bg-gray-50'
+            }`}
+        >
+          <input {...getInputProps()} />
+          <div className="flex flex-col items-center gap-4 text-center">
+            <div className="p-4 rounded-full bg-primary/10">
+              {isProcessing ? (
+                <div className="animate-spin">
+                  <Upload className="w-8 h-8 text-primary" />
+                </div>
+              ) : file ? (
+                <FileText className="w-8 h-8 text-primary" />
+              ) : (
                 <Upload className="w-8 h-8 text-primary" />
-              </div>
-            ) : file ? (
-              <FileText className="w-8 h-8 text-primary" />
-            ) : (
-              <Upload className="w-8 h-8 text-primary" />
-            )}
-          </div>
-          <div>
-            {isProcessing ? (
-              <p className="font-medium">Analyzing your chat...</p>
-            ) : file ? (
-              <>
-                <p className="text-sm font-medium">{file.name}</p>
-                <p className="text-xs text-gray-500 mt-1">
-                  {(file.size / 1024).toFixed(2)} KB
-                </p>
-              </>
-            ) : (
-              <>
-                <p className="font-medium">Drop your WhatsApp chat export here</p>
-                <p className="text-sm text-gray-500 mt-1">
-                  or click to select file
-                </p>
-              </>
-            )}
+              )}
+            </div>
+            <div>
+              {isProcessing ? (
+                <p className="font-medium">Analyzing your chat...</p>
+              ) : file ? (
+                <>
+                  <p className="text-sm font-medium">{file.name}</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {(file.size / 1024).toFixed(2)} KB
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="font-medium">Drop your WhatsApp chat export here</p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    or click to select file
+                  </p>
+                </>
+              )}
+            </div>
           </div>
         </div>
+        
+        <Button 
+          onClick={handleSubmit}
+          disabled={!file || isProcessing}
+          className="w-full"
+        >
+          {isProcessing ? 'Analyzing...' : 'Analyze Chat'}
+        </Button>
       </div>
-      
-      <Button 
-        onClick={handleSubmit}
-        disabled={!file || isProcessing}
-        className="w-full"
-      >
-        {isProcessing ? 'Analyzing...' : 'Analyze Chat'}
-      </Button>
-    </div>
+
+      <Dialog open={showResults} onOpenChange={setShowResults}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Chat Analysis Results</DialogTitle>
+          </DialogHeader>
+          {analysisResults && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <h3 className="font-semibold">Message Stats</h3>
+                  <p>Total Messages: {analysisResults.total_messages}</p>
+                  <p>Messages Sent: {analysisResults.messages_sent}</p>
+                  <p>Messages Received: {analysisResults.messages_received}</p>
+                </div>
+                <div className="space-y-2">
+                  <h3 className="font-semibold">Sentiment Analysis</h3>
+                  <p>Positive: {formatPercentage(analysisResults.sentiment_analysis.positive)}</p>
+                  <p>Negative: {formatPercentage(analysisResults.sentiment_analysis.negative)}</p>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="font-semibold">Communication Style</h3>
+                <p>{analysisResults.communicator_type}</p>
+              </div>
+
+              {analysisResults.top_emojis.length > 0 && (
+                <div className="space-y-2">
+                  <h3 className="font-semibold">Top Emojis</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {analysisResults.top_emojis.map(({ emoji, count }, index) => (
+                      <span key={index} className="px-2 py-1 bg-gray-100 rounded-md text-sm">
+                        {emoji} ({count})
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <h3 className="font-semibold">Activity by Day</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  {Object.entries(analysisResults.day_distribution).map(([day, count]) => (
+                    <div key={day} className="flex justify-between">
+                      <span>{day}:</span>
+                      <span>{count} messages</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
