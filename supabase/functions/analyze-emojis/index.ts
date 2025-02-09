@@ -36,7 +36,7 @@ serve(async (req) => {
     }
 
     const requestBody = {
-      model: 'gpt-4o-mini',
+      model: 'gpt-4o',
       messages: [
         {
           role: 'system',
