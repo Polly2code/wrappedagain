@@ -1,4 +1,3 @@
-
 import { pipeline } from '@huggingface/transformers';
 
 export const calculateTimeDistribution = (messages: any[]) => {
@@ -68,9 +67,10 @@ export const processChat = async (fileContent: string) => {
     // Split the content into lines and filter out empty lines
     const lines = fileContent.split('\n').filter(line => line.trim() !== '');
     console.log('Total lines:', lines.length);
+    console.log('Sample line:', lines[0]); // Debug first line
     
-    // Updated regex pattern to match more WhatsApp formats
-    const messagePattern = /^\[?(\d{1,2}\/\d{1,2}\/(?:\d{2}|\d{4}))(?:,|\s)\s*(\d{1,2}:\d{2}(?::\d{2})?(?:\s*[AaPp][Mm])?)\]?\s*(?:[-\s:])*\s*([^:]+?):\s*(.+)$/;
+    // Updated regex pattern to match both German and standard WhatsApp formats
+    const messagePattern = /^\[?(\d{1,2}[\.\/]\d{1,2}[\.\/](?:\d{2}|\d{4}))(?:,|\s)\s*(\d{1,2}:\d{2}(?::\d{2})?)\]?\s*(?:[-\s:])*\s*([^:]+?):\s*(.+)$/;
     
     const messages = lines
       .map(line => {
@@ -83,34 +83,20 @@ export const processChat = async (fileContent: string) => {
         const [, datePart, timePart, sender, content] = match;
         
         try {
-          // Parse date
-          const [day, month, yearStr] = datePart.split('/');
-          const year = yearStr.length === 2 ? '20' + yearStr : yearStr;
+          // Parse date - handle both DD.MM.YY and DD/MM/YY formats
+          const dateComponents = datePart.split(/[\.\/]/);
+          const day = parseInt(dateComponents[0]);
+          const month = parseInt(dateComponents[1]) - 1; // Months are 0-based
+          let year = parseInt(dateComponents[2]);
+          if (year < 100) year += 2000; // Convert 2-digit year to 4-digit
           
           // Parse time
-          const timeMatch = timePart.match(/(\d{1,2}):(\d{2})(?::(\d{2})?)?(?:\s*([AaPp][Mm])?)?/);
-          if (!timeMatch) throw new Error('Invalid time format');
+          const [hours, minutes, seconds = '0'] = timePart.split(':').map(Number);
           
-          let [, hours, minutes, seconds = '0', meridian] = timeMatch;
-          
-          // Handle 12-hour format if present
-          if (meridian) {
-            let hr = parseInt(hours);
-            if (meridian.toLowerCase() === 'pm' && hr < 12) hr += 12;
-            if (meridian.toLowerCase() === 'am' && hr === 12) hr = 0;
-            hours = hr.toString();
-          }
-          
-          const date = new Date(
-            parseInt(year),
-            parseInt(month) - 1,
-            parseInt(day),
-            parseInt(hours),
-            parseInt(minutes),
-            parseInt(seconds)
-          );
+          const date = new Date(year, month, day, hours, minutes, parseInt(seconds));
           
           if (isNaN(date.getTime())) {
+            console.error('Invalid date components:', { day, month, year, hours, minutes, seconds });
             throw new Error('Invalid date');
           }
           
@@ -128,6 +114,10 @@ export const processChat = async (fileContent: string) => {
       .filter((msg): msg is NonNullable<typeof msg> => msg !== null);
 
     console.log(`Successfully parsed ${messages.length} messages`);
+    
+    if (messages.length === 0) {
+      throw new Error('No messages could be parsed from the file');
+    }
 
     // Initialize sentiment analysis pipeline
     const classifier = await pipeline('sentiment-analysis', 'Xenova/distilbert-base-uncased-finetuned-sst-2-english');
