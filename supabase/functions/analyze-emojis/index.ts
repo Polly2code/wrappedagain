@@ -1,5 +1,6 @@
 
 import { serve } from "https://deno.land/std@0.181.0/http/server.ts";
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
@@ -25,15 +26,15 @@ serve(async (req) => {
       throw new Error('OpenAI API key is not configured');
     }
 
-    console.log('Making request to OpenAI API...');
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    console.log('Making request to Langdock API...');
+    const response = await fetch('https://api.langdock.com/openai/us/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${openAIApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini', // Fixed model name
+        model: 'gpt-4o-mini',
         messages: [
           {
             role: 'system',
@@ -51,15 +52,15 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error('OpenAI API error response:', errorData);
-      throw new Error(`OpenAI API error: ${errorData.error?.message || 'Unknown error'}`);
+      console.error('Langdock API error response:', errorData);
+      throw new Error(`Langdock API error: ${errorData.error?.message || 'Unknown error'}`);
     }
 
     const data = await response.json();
-    console.log('OpenAI API response:', data);
+    console.log('Langdock API response:', data);
 
     if (!data.choices?.[0]?.message?.content) {
-      throw new Error('Invalid response format from OpenAI');
+      throw new Error('Invalid response format from Langdock');
     }
 
     const emojiAnalysis = JSON.parse(data.choices[0].message.content);
