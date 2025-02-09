@@ -10,7 +10,10 @@ interface TextClassificationOutput {
   results: TextClassificationSingle[];
 }
 
-const handleClassification = (output: TextClassificationOutput | TextClassificationSingle): TextClassificationSingle => {
+const handleClassification = (output: any): TextClassificationSingle => {
+  if (Array.isArray(output)) {
+    return output[0];
+  }
   if ('results' in output) {
     return output.results[0];
   }
