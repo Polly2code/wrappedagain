@@ -1,5 +1,5 @@
 
-import { pipeline } from '@huggingface/transformers';
+import { pipeline, TextClassificationOutput } from '@huggingface/transformers';
 
 export const calculateTimeDistribution = (messages: any[]) => {
   const distribution: Record<string, number> = {};
@@ -72,7 +72,6 @@ export const processChat = async (fileContent: string) => {
     const lines = fileContent.split('\n').filter(line => line.trim() !== '');
     console.log('Total lines to process:', lines.length);
     
-    // More specific regex pattern for WhatsApp chat format
     const messagePattern = /\[?(\d{1,2}[\.\/]\d{1,2}[\.\/]\d{2,4})[,\s]\s*(\d{1,2}:\d{2}(?::\d{2})?)\]?\s*(?:[-\s])*([^:]+?):\s*(.+)/;
     
     console.log('Starting message parsing...');
@@ -92,11 +91,9 @@ export const processChat = async (fileContent: string) => {
       const [, datePart, timePart, sender, content] = match;
       
       try {
-        // Parse date parts
         const [day, month, yearStr] = datePart.split(/[\.\/]/);
         const year = yearStr.length === 2 ? '20' + yearStr : yearStr;
         
-        // Parse time parts
         const [hours, minutes, seconds = '00'] = timePart.split(':');
         
         const timestamp = new Date(
@@ -132,7 +129,6 @@ export const processChat = async (fileContent: string) => {
       throw new Error('No messages could be parsed from the file. Please check the file format.');
     }
 
-    // Reduce sample size to improve performance
     const sampleSize = Math.min(20, messages.length);
     console.log(`Performing sentiment analysis on ${sampleSize} messages...`);
 
@@ -149,7 +145,12 @@ export const processChat = async (fileContent: string) => {
         try {
           const result = await classifier(msg.content);
           console.log('Sentiment result for message:', result);
-          return Array.isArray(result) ? result[0] : result;
+          // Handle both array and single result cases
+          const sentimentResult = Array.isArray(result) ? result[0] : result;
+          return {
+            label: sentimentResult.label || 'NEUTRAL',
+            score: sentimentResult.score || 0.5
+          };
         } catch (error) {
           console.error('Error in sentiment analysis:', error);
           return { label: 'NEUTRAL', score: 0.5 };
