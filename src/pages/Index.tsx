@@ -47,7 +47,7 @@ const Index = () => {
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12 animate-fade-up">
           <div className="inline-block px-4 py-1 bg-[#075E54]/10 backdrop-blur-sm rounded-full text-[#075E54] text-sm font-medium mb-4">
-            WhatsApp Wrapped
+            WhatsApp Wrapped 🪩
           </div>
           <h1 className="text-4xl font-bold mb-4 text-[#075E54]">
             Discover Your Chat Story
