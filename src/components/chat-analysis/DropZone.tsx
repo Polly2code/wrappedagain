@@ -35,7 +35,7 @@ export const DropZone = ({ file, isProcessing, setFile }: DropZoneProps) => {
       className={`p-8 border-2 border-dashed rounded-xl transition-all duration-200 ease-in-out animate-fade-up
         ${isDragActive 
           ? 'border-primary bg-primary/5' 
-          : 'border-gray-300 hover:border-primary/50 hover:bg-primary/40'
+          : 'border-gray-300 hover:border-primary/50 hover:bg-primary/20'
         }`}
     >
       <input {...getInputProps()} />
