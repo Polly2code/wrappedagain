@@ -64,12 +64,10 @@ export const processChat = async (fileContent: string) => {
   try {
     console.log('Starting chat analysis...');
     
-    // Split the content into lines and filter out empty lines
     const lines = fileContent.split('\n').filter(line => line.trim() !== '');
     console.log('Total lines:', lines.length);
-    console.log('Sample line:', lines[0]); // Debug first line
+    console.log('Sample line:', lines[0]);
     
-    // Updated regex pattern to match both German and standard WhatsApp formats
     const messagePattern = /^\[?(\d{1,2}[\.\/]\d{1,2}[\.\/](?:\d{2}|\d{4}))(?:,|\s)\s*(\d{1,2}:\d{2}(?::\d{2})?)\]?\s*(?:[-\s:])*\s*([^:]+?):\s*(.+)$/;
     
     const messages = lines
@@ -83,17 +81,18 @@ export const processChat = async (fileContent: string) => {
         const [, datePart, timePart, sender, content] = match;
         
         try {
-          // Parse date - handle both DD.MM.YY and DD/MM/YY formats
           const dateComponents = datePart.split(/[\.\/]/);
           const day = parseInt(dateComponents[0]);
-          const month = parseInt(dateComponents[1]) - 1; // Months are 0-based
+          const month = parseInt(dateComponents[1]) - 1;
           let year = parseInt(dateComponents[2]);
-          if (year < 100) year += 2000; // Convert 2-digit year to 4-digit
+          if (year < 100) year += 2000;
           
-          // Parse time
-          const [hours, minutes, seconds = '0'] = timePart.split(':').map(Number);
+          const timeComponents = timePart.split(':');
+          const hours = parseInt(timeComponents[0]);
+          const minutes = parseInt(timeComponents[1]);
+          const seconds = timeComponents[2] ? parseInt(timeComponents[2]) : 0;
           
-          const date = new Date(year, month, day, hours, minutes, parseInt(seconds));
+          const date = new Date(year, month, day, hours, minutes, seconds);
           
           if (isNaN(date.getTime())) {
             console.error('Invalid date components:', { day, month, year, hours, minutes, seconds });
@@ -119,10 +118,8 @@ export const processChat = async (fileContent: string) => {
       throw new Error('No messages could be parsed from the file');
     }
 
-    // Initialize sentiment analysis pipeline
     const classifier = await pipeline('sentiment-analysis', 'Xenova/distilbert-base-uncased-finetuned-sst-2-english');
 
-    // Analyze sentiment for a sample of messages
     const sampleSize = Math.min(100, messages.length);
     const sampleMessages = messages
       .sort(() => 0.5 - Math.random())
