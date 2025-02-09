@@ -16,8 +16,12 @@ export const DropZone = ({ file, isProcessing, setFile }: DropZoneProps) => {
     if (uploadedFile?.name.endsWith('.txt')) {
       setFile(uploadedFile);
       toast.success('Chat file uploaded successfully!');
+    } else if (uploadedFile?.name.endsWith('.zip')) {
+      toast.info('Processing zip file...');
+      setFile(uploadedFile);
+      toast.success('Zip file uploaded successfully!');
     } else {
-      toast.error('Please upload a valid WhatsApp chat export file (.txt)');
+      toast.error('Please upload a valid WhatsApp chat export file (.txt) or zip file');
     }
   }, [setFile]);
 
@@ -25,6 +29,7 @@ export const DropZone = ({ file, isProcessing, setFile }: DropZoneProps) => {
     onDrop,
     accept: {
       'text/plain': ['.txt'],
+      'application/zip': ['.zip'],
     },
     maxFiles: 1
   });
@@ -67,7 +72,7 @@ export const DropZone = ({ file, isProcessing, setFile }: DropZoneProps) => {
             <>
               <p className="font-medium">Drop your WhatsApp chat export here</p>
               <p className="text-sm text-gray-500 mt-1">
-                or click to select file
+                Accepts .txt or .zip files
               </p>
             </>
           )}

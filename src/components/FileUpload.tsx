@@ -6,6 +6,7 @@ import { DropZone } from './chat-analysis/DropZone';
 import { AnalysisResults } from './chat-analysis/AnalysisResults';
 import { processChat } from '@/lib/chat-analysis';
 import { ChatAnalysisResult } from '@/types/chat';
+import JSZip from 'jszip';
 
 export const FileUpload = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -24,48 +25,57 @@ export const FileUpload = () => {
     }
 
     setIsProcessing(true);
-    const reader = new FileReader();
     
-    reader.onload = async (e) => {
-      const text = e.target?.result;
-      console.log('File content loaded:', (text as string)?.substring(0, 200) + '...');
+    try {
+      let textContent: string;
       
-      if (typeof text === 'string') {
-        try {
-          console.log('Starting chat processing...');
-          const results = await processChat(text);
-          console.log('Analysis results:', results);
-          setAnalysisResults(results);
-          setShowResults(true);
-          toast({
-            title: "Success",
-            description: 'Chat analysis completed!',
-            className: "bg-transparent border-primary",
-          });
-        } catch (error) {
-          console.error('Error in analysis:', error);
-          toast({
-            title: "Error",
-            description: error instanceof Error ? error.message : 'Error analyzing chat file',
-            className: "bg-transparent border-red-500",
-          });
-        } finally {
-          setIsProcessing(false);
+      if (file.name.endsWith('.zip')) {
+        const zip = new JSZip();
+        const zipContent = await zip.loadAsync(file);
+        
+        // Find the first .txt file in the zip
+        const txtFiles = Object.keys(zipContent.files).filter(filename => 
+          filename.endsWith('.txt')
+        );
+        
+        if (txtFiles.length === 0) {
+          throw new Error('No txt file found in the zip archive');
         }
+        
+        const txtFile = zipContent.files[txtFiles[0]];
+        textContent = await txtFile.async('string');
+        console.log('Extracted text content from zip:', textContent.substring(0, 200) + '...');
+      } else {
+        // Handle regular txt file
+        const reader = new FileReader();
+        textContent = await new Promise((resolve, reject) => {
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.onerror = (error) => reject(error);
+          reader.readAsText(file);
+        });
+        console.log('File content loaded:', textContent.substring(0, 200) + '...');
       }
-    };
-
-    reader.onerror = (error) => {
-      console.error('Error reading file:', error);
+      
+      console.log('Starting chat processing...');
+      const results = await processChat(textContent);
+      console.log('Analysis results:', results);
+      setAnalysisResults(results);
+      setShowResults(true);
+      toast({
+        title: "Success",
+        description: 'Chat analysis completed!',
+        className: "bg-transparent border-primary",
+      });
+    } catch (error) {
+      console.error('Error in analysis:', error);
       toast({
         title: "Error",
-        description: 'Error reading file',
+        description: error instanceof Error ? error.message : 'Error analyzing chat file',
         className: "bg-transparent border-red-500",
       });
+    } finally {
       setIsProcessing(false);
-    };
-
-    reader.readAsText(file);
+    }
   };
 
   return (
