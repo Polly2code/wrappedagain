@@ -1,5 +1,10 @@
 
-import { pipeline, TextClassificationOutput } from '@huggingface/transformers';
+import { pipeline } from '@huggingface/transformers';
+
+interface TextClassificationResult {
+  label: string;
+  score: number;
+}
 
 export const calculateTimeDistribution = (messages: any[]) => {
   const distribution: Record<string, number> = {};
@@ -145,11 +150,10 @@ export const processChat = async (fileContent: string) => {
         try {
           const result = await classifier(msg.content);
           console.log('Sentiment result for message:', result);
-          // Handle both array and single result cases
-          const sentimentResult = Array.isArray(result) ? result[0] : result;
+          const output = Array.isArray(result) ? result[0] : result as TextClassificationResult;
           return {
-            label: sentimentResult.label || 'NEUTRAL',
-            score: sentimentResult.score || 0.5
+            label: output.label || 'NEUTRAL',
+            score: output.score || 0.5
           };
         } catch (error) {
           console.error('Error in sentiment analysis:', error);
