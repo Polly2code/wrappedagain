@@ -1,4 +1,3 @@
-
 import { pipeline } from '@huggingface/transformers';
 
 // Type definitions for sentiment analysis
@@ -74,6 +73,21 @@ export const determineCommunicatorType = (messages: Message[]) => {
   return categories[5];
 };
 
+let classifier: any = null;
+
+const initializeClassifier = async () => {
+  if (!classifier) {
+    console.log('Initializing sentiment analysis pipeline...');
+    classifier = await pipeline('sentiment-analysis', 'Xenova/distilbert-base-uncased-finetuned-sst-2-english', {
+      quantized: true,
+      progress_callback: (progress: any) => {
+        console.log('Loading model:', Math.round(progress.progress * 100), '%');
+      }
+    });
+  }
+  return classifier;
+};
+
 export const processChat = async (fileContent: string) => {
   try {
     console.log('Starting chat analysis with content length:', fileContent.length);
@@ -85,7 +99,6 @@ export const processChat = async (fileContent: string) => {
     const lines = fileContent.split('\n').filter(line => line.trim() !== '');
     console.log('Total lines to process:', lines.length);
     
-    // Updated regex pattern to handle various WhatsApp date/time formats
     const messagePattern = /\[?(\d{1,2}[\.\/]\d{1,2}[\.\/]\d{2,4})[,\s]\s*(\d{1,2}:\d{2}(?::\d{2})?)\]?\s*(?:[-\s])*([^:]+?):\s*(.+)/;
     
     console.log('Starting message parsing...');
@@ -98,7 +111,6 @@ export const processChat = async (fileContent: string) => {
       
       if (!match) {
         failedParses++;
-        console.log('Failed to parse line:', line);
         continue;
       }
       
@@ -129,11 +141,9 @@ export const processChat = async (fileContent: string) => {
           successfulParses++;
         } else {
           failedParses++;
-          console.log('Invalid date created for line:', line);
         }
       } catch (error) {
         failedParses++;
-        console.error('Error parsing date/time:', error, 'for line:', line);
       }
     }
 
@@ -143,47 +153,54 @@ export const processChat = async (fileContent: string) => {
       throw new Error('No messages could be parsed from the file. Please check the file format.');
     }
 
-    const sampleSize = Math.min(20, messages.length);
-    console.log(`Performing sentiment analysis on ${sampleSize} messages...`);
-
-    console.log('Initializing sentiment analysis pipeline...');
-    const classifier = await pipeline('sentiment-analysis', 'Xenova/distilbert-base-uncased-finetuned-sst-2-english');
-    
-    const sampleMessages = messages
-      .sort(() => 0.5 - Math.random())
-      .slice(0, sampleSize);
-
-    console.log('Running sentiment analysis...');
-    const sentiments = await Promise.all(
-      sampleMessages.map(async (msg) => {
-        try {
-          const result = await classifier(msg.content);
-          console.log('Sentiment result for message:', result);
-          return result[0] as SentimentResult;
-        } catch (error) {
-          console.error('Error in sentiment analysis:', error);
-          return { label: 'NEUTRAL', score: 0.5 };
-        }
-      })
-    );
-
-    console.log('Calculating final results...');
-    const results = {
+    const basicResults = {
       total_messages: messages.length,
       messages_sent: messages.filter(m => m.sender === messages[0].sender).length,
       messages_received: messages.filter(m => m.sender !== messages[0].sender).length,
       time_distribution: calculateTimeDistribution(messages),
       day_distribution: calculateDayDistribution(messages),
       top_emojis: calculateEmojiUsage(messages),
-      sentiment_analysis: {
-        positive: sentiments.filter(s => s.label === 'POSITIVE').length / sampleSize,
-        negative: sentiments.filter(s => s.label === 'NEGATIVE').length / sampleSize,
-      },
       communicator_type: determineCommunicatorType(messages),
+      sentiment_analysis: {
+        positive: 0,
+        negative: 0,
+      }
     };
 
-    console.log('Analysis complete! Results:', results);
-    return results;
+    const sampleSize = Math.min(20, messages.length);
+    console.log(`Performing sentiment analysis on ${sampleSize} messages...`);
+
+    try {
+      const clf = await initializeClassifier();
+      
+      const sampleMessages = messages
+        .sort(() => 0.5 - Math.random())
+        .slice(0, sampleSize);
+
+      console.log('Running sentiment analysis...');
+      const sentiments = await Promise.all(
+        sampleMessages.map(async (msg) => {
+          try {
+            const result = await clf(msg.content);
+            return result[0] as SentimentResult;
+          } catch (error) {
+            console.error('Error in sentiment analysis:', error);
+            return { label: 'NEUTRAL', score: 0.5 };
+          }
+        })
+      );
+
+      basicResults.sentiment_analysis = {
+        positive: sentiments.filter(s => s.label === 'POSITIVE').length / sampleSize,
+        negative: sentiments.filter(s => s.label === 'NEGATIVE').length / sampleSize,
+      };
+    } catch (error) {
+      console.error('Error in sentiment analysis:', error);
+      // Continue with basic results if sentiment analysis fails
+    }
+
+    console.log('Analysis complete! Results:', basicResults);
+    return basicResults;
 
   } catch (error) {
     console.error('Error in chat analysis:', error);
