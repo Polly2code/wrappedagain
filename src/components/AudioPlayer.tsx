@@ -50,17 +50,20 @@ const AudioPlayer = () => {
 
   return (
     <>
-      <div className="fixed top-4 right-4 z-50 flex gap-2">
-        {!isPlaying && (
+      {!isPlaying && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
           <Button
             variant="outline"
             size="icon"
             onClick={handlePlayClick}
-            className="bg-primary/10 backdrop-blur-sm hover:bg-primary/20"
+            className="w-32 h-32 rounded-full bg-primary/10 backdrop-blur-sm hover:bg-primary/20 transition-all duration-300 hover:scale-110"
           >
-            <Play className="h-5 w-5 text-primary" />
+            <Play className="h-16 w-16 text-primary" />
           </Button>
-        )}
+        </div>
+      )}
+      
+      <div className="fixed top-4 right-4 z-50">
         <Button
           variant="outline"
           size="icon"
