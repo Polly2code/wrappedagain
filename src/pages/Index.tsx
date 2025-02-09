@@ -60,7 +60,9 @@ const Index = () => {
         <FileUpload />
         
         <div className="mt-12 text-center text-sm text-[#075E54]/80 animate-fade-up bg-white/10 backdrop-blur-sm rounded-xl p-6">
-          <h3 className="font-medium text-[#075E54] mb-4">How to export your chat</h3>
+          <h3 className="font-bold text-[#075E54] mb-4">
+            How to export your chat
+          </h3>
           <ol className="space-y-2">
             <li>1. Open WhatsApp and go to the chat</li>
             <li>2. Tap on the chat name at the top</li>
@@ -79,3 +81,4 @@ const Index = () => {
 };
 
 export default Index;
+
