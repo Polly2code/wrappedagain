@@ -55,8 +55,8 @@ const Index = () => {
           </p>
         </div>
 
-        <FileUpload />
         <PrivacyNotice />
+        <FileUpload />
         
         <div className="mt-12 text-center text-sm text-[#075E54]/80 animate-fade-up bg-white/10 backdrop-blur-sm rounded-xl p-6">
           <h3 className="font-medium text-[#075E54] mb-4">How to export your chat</h3>
