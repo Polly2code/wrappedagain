@@ -1,4 +1,3 @@
-
 import { FileUpload } from "@/components/FileUpload";
 import { PrivacyNotice } from "@/components/PrivacyNotice";
 import { useEffect } from "react";
@@ -37,8 +36,7 @@ const Index = () => {
             filter: 'drop-shadow(0 10px 8px rgb(0 0 0 / 0.1))',
             transform: 'perspective(500px) rotateX(5deg)',
           }}>
-            wrappedagain • wrappedagain • wrappedagain • wrappedagain • wrappedagain • 
-            wrappedagain • wrappedagain • wrappedagain • wrappedagain • wrappedagain
+            wrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagain
           </span>
         </div>
       </div>
