@@ -39,7 +39,7 @@ export const calculateEmojiUsage = async (messages: Message[]) => {
   }
 };
 
-export const determineCommunicatorType = async (messages: Message[]) => {
+export const determineCommunicatorType = async (messages: Message[]): Promise<Record<string, string>> => {
   try {
     const { data, error } = await supabase.functions.invoke('analyze-emojis', {
       body: { messages, analysis_type: 'communication_style' },
@@ -47,12 +47,19 @@ export const determineCommunicatorType = async (messages: Message[]) => {
 
     if (error) {
       console.error('Error analyzing communication style:', error);
-      return 'The Casual Conversationalist 💬';
+      return {
+        [messages[0].sender]: 'The Casual Conversationalist 💬',
+        [messages.find(m => m.sender !== messages[0].sender)?.sender || 'Other']: 'The Casual Conversationalist 💬'
+      };
     }
 
     return data.communication_styles;
   } catch (error) {
     console.error('Error calling communication style analysis:', error);
-    return 'The Casual Conversationalist 💬';
+    return {
+      [messages[0].sender]: 'The Casual Conversationalist 💬',
+      [messages.find(m => m.sender !== messages[0].sender)?.sender || 'Other']: 'The Casual Conversationalist 💬'
+    };
   }
 };
+

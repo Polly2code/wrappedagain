@@ -18,9 +18,10 @@ export interface ChatAnalysisResult {
   time_distribution: Record<string, number>;
   day_distribution: Record<string, number>;
   top_emojis: Array<{ emoji: string; count: number }>;
-  communicator_type: string;
+  communication_styles: Record<string, string>;
   sentiment_analysis: {
     positive: number;
     negative: number;
   };
 }
+

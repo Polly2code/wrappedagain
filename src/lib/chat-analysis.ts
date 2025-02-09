@@ -15,8 +15,9 @@ export const processChat = async (fileContent: string): Promise<ChatAnalysisResu
     const messages = parseMessages(fileContent);
     console.log(`Successfully parsed ${messages.length} messages`);
     
-    const [topEmojis] = await Promise.all([
+    const [topEmojis, styles] = await Promise.all([
       calculateEmojiUsage(messages),
+      determineCommunicatorType(messages)
     ]);
 
     const basicResults: ChatAnalysisResult = {
@@ -26,7 +27,7 @@ export const processChat = async (fileContent: string): Promise<ChatAnalysisResu
       time_distribution: calculateTimeDistribution(messages),
       day_distribution: calculateDayDistribution(messages),
       top_emojis: topEmojis,
-      communicator_type: determineCommunicatorType(messages),
+      communication_styles: styles,
       sentiment_analysis: {
         positive: 0.5,
         negative: 0.5,
@@ -48,3 +49,4 @@ export {
   calculateEmojiUsage,
   determineCommunicatorType
 };
+
