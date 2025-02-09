@@ -1,6 +1,7 @@
 
 interface SoundCloudWidget {
-  Widget: (iframe: string | HTMLIFrameElement) => SoundCloudPlayer & {
+  Widget: {
+    (iframe: string | HTMLIFrameElement): SoundCloudPlayer;
     Events: {
       READY: string;
       PLAY: string;
