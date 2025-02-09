@@ -30,10 +30,7 @@ const Index = () => {
           <span className="inline-block text-[#F4EF53] text-9xl font-bold px-4 text-center w-full tracking-wider" style={{ 
             fontFamily: 'Orbitron, system-ui',
             fontWeight: '900',
-            WebkitTextStroke: '3px #F97316',
             textShadow: `
-              4px 4px 0px #F97316,
-              8px 8px 16px rgba(249, 115, 22, 0.3),
               -2px -2px 4px rgba(255, 255, 255, 0.8),
               2px 2px 8px rgba(0, 0, 0, 0.15)
             `,
