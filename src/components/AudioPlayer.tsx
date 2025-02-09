@@ -1,10 +1,11 @@
 
 import { useState, useEffect } from 'react';
-import { Volume2, VolumeX } from 'lucide-react';
+import { Volume2, VolumeX, Play } from 'lucide-react';
 import { Button } from './ui/button';
 
 const AudioPlayer = () => {
   const [isMuted, setIsMuted] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     // Initialize SoundCloud Widget API using HTTPS
@@ -19,11 +20,11 @@ const AudioPlayer = () => {
       widget.bind(SC.Widget.Events.READY, () => {
         console.log('SoundCloud player is ready');
         widget.setVolume(100);
-        widget.play();
       });
 
       widget.bind(SC.Widget.Events.PLAY, () => {
         console.log('Started playing');
+        setIsPlaying(true);
       });
 
       widget.bind(SC.Widget.Events.ERROR, () => {
@@ -42,9 +43,24 @@ const AudioPlayer = () => {
     widget.setVolume(isMuted ? 100 : 0);
   };
 
+  const handlePlayClick = () => {
+    const widget = SC.Widget('soundcloud-player');
+    widget.play();
+  };
+
   return (
     <>
-      <div className="fixed top-4 right-4 z-50">
+      <div className="fixed top-4 right-4 z-50 flex gap-2">
+        {!isPlaying && (
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handlePlayClick}
+            className="bg-primary/10 backdrop-blur-sm hover:bg-primary/20"
+          >
+            <Play className="h-5 w-5 text-primary" />
+          </Button>
+        )}
         <Button
           variant="outline"
           size="icon"
@@ -68,7 +84,7 @@ const AudioPlayer = () => {
           frameBorder="no" 
           allow="autoplay" 
           className="rounded-lg shadow-lg"
-          src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1470306682&color=%23ff5500&auto_play=true&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"
+          src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1470306682&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"
         />
       </div>
     </>
