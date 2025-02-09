@@ -1,3 +1,4 @@
+
 import { pipeline } from '@huggingface/transformers';
 
 export const calculateTimeDistribution = (messages: any[]) => {
@@ -65,16 +66,19 @@ export const processChat = async (fileContent: string) => {
     console.log('Starting chat analysis...');
     
     const lines = fileContent.split('\n').filter(line => line.trim() !== '');
-    console.log('Total lines:', lines.length);
-    console.log('Sample line:', lines[0]);
+    console.log('Total lines to process:', lines.length);
     
     const messagePattern = /^\[?(\d{1,2}[\.\/]\d{1,2}[\.\/](?:\d{2}|\d{4}))(?:,|\s)\s*(\d{1,2}:\d{2}(?::\d{2})?)\]?\s*(?:[-\s:])*\s*([^:]+?):\s*(.+)$/;
     
+    console.log('Parsing messages...');
     const messages = lines
-      .map(line => {
+      .map((line, index) => {
+        if (index % 1000 === 0) {
+          console.log(`Processed ${index}/${lines.length} messages...`);
+        }
+
         const match = line.match(messagePattern);
         if (!match) {
-          console.log('Non-matching line:', line);
           return null;
         }
         
@@ -95,8 +99,8 @@ export const processChat = async (fileContent: string) => {
           const date = new Date(year, month, day, hours, minutes, seconds);
           
           if (isNaN(date.getTime())) {
-            console.error('Invalid date components:', { day, month, year, hours, minutes, seconds });
-            throw new Error('Invalid date');
+            console.log('Skipping message due to invalid date:', { datePart, timePart });
+            return null;
           }
           
           return {
@@ -106,7 +110,7 @@ export const processChat = async (fileContent: string) => {
             has_emoji: /[\p{Emoji}]/u.test(content),
           };
         } catch (error) {
-          console.error('Error parsing message:', { datePart, timePart, error });
+          console.log('Error parsing message:', { datePart, timePart });
           return null;
         }
       })
@@ -118,9 +122,13 @@ export const processChat = async (fileContent: string) => {
       throw new Error('No messages could be parsed from the file');
     }
 
+    console.log('Initializing sentiment analysis...');
     const classifier = await pipeline('sentiment-analysis', 'Xenova/distilbert-base-uncased-finetuned-sst-2-english');
 
-    const sampleSize = Math.min(100, messages.length);
+    // Reduce sample size for sentiment analysis
+    const sampleSize = Math.min(50, messages.length);
+    console.log(`Analyzing sentiment for ${sampleSize} sample messages...`);
+    
     const sampleMessages = messages
       .sort(() => 0.5 - Math.random())
       .slice(0, sampleSize);
@@ -128,18 +136,22 @@ export const processChat = async (fileContent: string) => {
     type SentimentResult = { label: string; score: number; };
     
     const sentiments = await Promise.all(
-      sampleMessages.map(async (msg) => {
+      sampleMessages.map(async (msg, index) => {
+        if (index % 10 === 0) {
+          console.log(`Sentiment analysis progress: ${index}/${sampleSize}`);
+        }
         try {
           const result = await classifier(msg.content);
           const sentimentResult = Array.isArray(result) ? result[0] : result;
           return sentimentResult as SentimentResult;
         } catch (error) {
-          console.error('Error analyzing sentiment for message:', msg.content, error);
+          console.log('Error analyzing sentiment for message:', msg.content);
           return { label: 'NEUTRAL', score: 0.5 };
         }
       })
     );
 
+    console.log('Calculating final results...');
     const results = {
       total_messages: messages.length,
       messages_sent: messages.filter(m => m.sender === messages[0].sender).length,
@@ -154,7 +166,7 @@ export const processChat = async (fileContent: string) => {
       communicator_type: determineCommunicatorType(messages),
     };
 
-    console.log('Analysis results:', results);
+    console.log('Analysis complete!');
     return results;
 
   } catch (error) {
