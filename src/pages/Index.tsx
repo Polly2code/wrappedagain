@@ -55,7 +55,6 @@ const Index = () => {
           </p>
         </div>
 
-        <PrivacyNotice />
         <FileUpload />
         
         <div className="mt-12 text-center text-sm text-[#075E54]/80 animate-fade-up bg-white/10 backdrop-blur-sm rounded-xl p-6">
@@ -67,6 +66,10 @@ const Index = () => {
             <li>4. Select "Without Media"</li>
             <li>5. Save the file and upload it here</li>
           </ol>
+        </div>
+
+        <div className="mt-12">
+          <PrivacyNotice />
         </div>
       </div>
     </div>
