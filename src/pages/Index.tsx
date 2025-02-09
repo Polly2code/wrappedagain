@@ -1,6 +1,6 @@
 
-import FileUpload from "@/components/FileUpload";
-import PrivacyNotice from "@/components/PrivacyNotice";
+import { FileUpload } from "@/components/FileUpload";
+import { PrivacyNotice } from "@/components/PrivacyNotice";
 import AudioPlayer from "@/components/AudioPlayer";
 import { useEffect } from "react";
 
