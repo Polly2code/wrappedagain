@@ -1,4 +1,3 @@
-
 import { pipeline } from '@huggingface/transformers';
 
 export const calculateTimeDistribution = (messages: any[]) => {
@@ -68,53 +67,49 @@ export const processChat = async (fileContent: string) => {
     const lines = fileContent.split('\n').filter(line => line.trim() !== '');
     console.log('Total lines to process:', lines.length);
     
-    const messagePattern = /^\[?(\d{1,2}[\.\/]\d{1,2}[\.\/](?:\d{2}|\d{4}))(?:,|\s)\s*(\d{1,2}:\d{2}(?::\d{2})?)\]?\s*(?:[-\s:])*\s*([^:]+?):\s*(.+)$/;
+    const messagePattern = /^\[?(\d{1,2}[\.\/]\d{1,2}[\.\/]\d{2,4})[,\s]\s*(\d{1,2}:\d{2}(?::\d{2})?)\]?\s*(?:[-\s:])*\s*([^:]+?):\s*(.+)$/;
     
     console.log('Parsing messages...');
-    const messages = lines
-      .map((line, index) => {
-        if (index % 1000 === 0) {
-          console.log(`Processed ${index}/${lines.length} messages...`);
-        }
+    const messages = [];
+    
+    for (let i = 0; i < lines.length; i++) {
+      if (i % 1000 === 0) {
+        console.log(`Processing messages: ${i}/${lines.length}`);
+      }
 
-        const match = line.match(messagePattern);
-        if (!match) {
-          return null;
-        }
+      const line = lines[i];
+      const match = line.match(messagePattern);
+      
+      if (!match) continue;
+      
+      const [, datePart, timePart, sender, content] = match;
+      
+      try {
+        const dateComponents = datePart.split(/[\.\/]/);
+        const day = parseInt(dateComponents[0]);
+        const month = parseInt(dateComponents[1]) - 1;
+        let year = parseInt(dateComponents[2]);
+        if (year < 100) year += 2000;
         
-        const [, datePart, timePart, sender, content] = match;
+        const timeComponents = timePart.split(':');
+        const hours = parseInt(timeComponents[0]);
+        const minutes = parseInt(timeComponents[1]);
+        const seconds = timeComponents[2] ? parseInt(timeComponents[2]) : 0;
         
-        try {
-          const dateComponents = datePart.split(/[\.\/]/);
-          const day = parseInt(dateComponents[0]);
-          const month = parseInt(dateComponents[1]) - 1;
-          let year = parseInt(dateComponents[2]);
-          if (year < 100) year += 2000;
-          
-          const timeComponents = timePart.split(':');
-          const hours = parseInt(timeComponents[0]);
-          const minutes = parseInt(timeComponents[1]);
-          const seconds = timeComponents[2] ? parseInt(timeComponents[2]) : 0;
-          
-          const date = new Date(year, month, day, hours, minutes, seconds);
-          
-          if (isNaN(date.getTime())) {
-            console.log('Skipping message due to invalid date:', { datePart, timePart });
-            return null;
-          }
-          
-          return {
+        const date = new Date(year, month, day, hours, minutes, seconds);
+        
+        if (!isNaN(date.getTime())) {
+          messages.push({
             sender: sender.trim(),
             content: content.trim(),
             timestamp: date.toISOString(),
-            has_emoji: /[\p{Emoji}]/u.test(content),
-          };
-        } catch (error) {
-          console.log('Error parsing message:', { datePart, timePart });
-          return null;
+            has_emoji: /[\p{Emoji}]/u.test(content)
+          });
         }
-      })
-      .filter((msg): msg is NonNullable<typeof msg> => msg !== null);
+      } catch (error) {
+        continue;
+      }
+    }
 
     console.log(`Successfully parsed ${messages.length} messages`);
     
@@ -122,12 +117,10 @@ export const processChat = async (fileContent: string) => {
       throw new Error('No messages could be parsed from the file');
     }
 
-    console.log('Initializing sentiment analysis...');
-    const classifier = await pipeline('sentiment-analysis', 'Xenova/distilbert-base-uncased-finetuned-sst-2-english');
+    const sampleSize = Math.min(20, messages.length);
+    console.log(`Performing sentiment analysis on ${sampleSize} messages...`);
 
-    // Reduce sample size for sentiment analysis
-    const sampleSize = Math.min(50, messages.length);
-    console.log(`Analyzing sentiment for ${sampleSize} sample messages...`);
+    const classifier = await pipeline('sentiment-analysis', 'Xenova/distilbert-base-uncased-finetuned-sst-2-english');
     
     const sampleMessages = messages
       .sort(() => 0.5 - Math.random())
@@ -136,16 +129,12 @@ export const processChat = async (fileContent: string) => {
     type SentimentResult = { label: string; score: number; };
     
     const sentiments = await Promise.all(
-      sampleMessages.map(async (msg, index) => {
-        if (index % 10 === 0) {
-          console.log(`Sentiment analysis progress: ${index}/${sampleSize}`);
-        }
+      sampleMessages.map(async (msg) => {
         try {
           const result = await classifier(msg.content);
           const sentimentResult = Array.isArray(result) ? result[0] : result;
           return sentimentResult as SentimentResult;
         } catch (error) {
-          console.log('Error analyzing sentiment for message:', msg.content);
           return { label: 'NEUTRAL', score: 0.5 };
         }
       })
