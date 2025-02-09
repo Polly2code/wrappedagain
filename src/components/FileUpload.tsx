@@ -3,14 +3,92 @@ import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Upload, FileText } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/lib/supabase';
 
 export const FileUpload = () => {
   const [file, setFile] = useState<File | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
+  const processChat = async (fileContent: string) => {
+    try {
+      // Upload chat metadata
+      const { data: uploadData, error: uploadError } = await supabase
+        .from('chat_uploads')
+        .insert({
+          file_name: file?.name,
+        })
+        .select()
+        .single();
+
+      if (uploadError) throw uploadError;
+
+      // Process messages
+      const lines = fileContent.split('\n');
+      const messagePattern = /\[(\d{2}\/\d{2}\/\d{2}, \d{2}:\d{2}:\d{2})\] ([^:]+): (.*)/;
+      const messages = lines
+        .filter(line => messagePattern.test(line))
+        .map(line => {
+          const [, timestamp, sender, content] = line.match(messagePattern) || [];
+          return {
+            chat_upload_id: uploadData.id,
+            sender,
+            content,
+            timestamp: new Date(timestamp.replace(/(\d{2})\/(\d{2})\/(\d{2})/, '20$3-$2-$1')),
+            has_emoji: /[\p{Emoji}]/u.test(content),
+          };
+        });
+
+      // Insert messages
+      const { error: messagesError } = await supabase
+        .from('messages')
+        .insert(messages);
+
+      if (messagesError) throw messagesError;
+
+      // Calculate analysis
+      const analysis = {
+        chat_upload_id: uploadData.id,
+        total_messages: messages.length,
+        messages_sent: messages.filter(m => m.sender === messages[0].sender).length,
+        messages_received: messages.filter(m => m.sender !== messages[0].sender).length,
+        time_distribution: calculateTimeDistribution(messages),
+        day_distribution: calculateDayDistribution(messages),
+        top_emojis: calculateEmojiUsage(messages),
+        communicator_type: determineCommunicatorType(messages),
+      };
+
+      // Insert analysis results
+      const { error: analysisError } = await supabase
+        .from('analysis_results')
+        .insert(analysis);
+
+      if (analysisError) throw analysisError;
+
+      toast.success('Chat analysis completed!');
+      // Here you would typically redirect to the analysis results page
+    } catch (error) {
+      console.error('Error processing chat:', error);
+      toast.error('Error processing chat file');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const onDrop = useCallback(async (acceptedFiles: File[]) => {
     const uploadedFile = acceptedFiles[0];
     if (uploadedFile?.name.endsWith('.txt')) {
       setFile(uploadedFile);
+      setIsProcessing(true);
+      
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const text = e.target?.result;
+        if (typeof text === 'string') {
+          await processChat(text);
+        }
+      };
+      reader.readAsText(uploadedFile);
+      
       toast.success('Chat file uploaded successfully!');
     } else {
       toast.error('Please upload a valid WhatsApp chat export file (.txt)');
@@ -38,10 +116,20 @@ export const FileUpload = () => {
         <input {...getInputProps()} />
         <div className="flex flex-col items-center gap-4 text-center">
           <div className="p-4 rounded-full bg-primary/10">
-            {file ? <FileText className="w-8 h-8 text-primary" /> : <Upload className="w-8 h-8 text-primary" />}
+            {isProcessing ? (
+              <div className="animate-spin">
+                <Upload className="w-8 h-8 text-primary" />
+              </div>
+            ) : file ? (
+              <FileText className="w-8 h-8 text-primary" />
+            ) : (
+              <Upload className="w-8 h-8 text-primary" />
+            )}
           </div>
           <div>
-            {file ? (
+            {isProcessing ? (
+              <p className="font-medium">Processing your chat...</p>
+            ) : file ? (
               <>
                 <p className="text-sm font-medium">{file.name}</p>
                 <p className="text-xs text-gray-500 mt-1">
@@ -61,4 +149,67 @@ export const FileUpload = () => {
       </div>
     </div>
   );
+};
+
+// Utility functions for analysis
+const calculateTimeDistribution = (messages: any[]) => {
+  const distribution: Record<string, number> = {};
+  messages.forEach(msg => {
+    const hour = new Date(msg.timestamp).getHours();
+    distribution[hour] = (distribution[hour] || 0) + 1;
+  });
+  return distribution;
+};
+
+const calculateDayDistribution = (messages: any[]) => {
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const distribution: Record<string, number> = {};
+  messages.forEach(msg => {
+    const day = days[new Date(msg.timestamp).getDay()];
+    distribution[day] = (distribution[day] || 0) + 1;
+  });
+  return distribution;
+};
+
+const calculateEmojiUsage = (messages: any[]) => {
+  const emojiRegex = /[\p{Emoji}]/gu;
+  const emojiCounts: Record<string, number> = {};
+  
+  messages.forEach(msg => {
+    const emojis = msg.content.match(emojiRegex) || [];
+    emojis.forEach(emoji => {
+      emojiCounts[emoji] = (emojiCounts[emoji] || 0) + 1;
+    });
+  });
+
+  return Object.entries(emojiCounts)
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 10)
+    .map(([emoji, count]) => ({ emoji, count }));
+};
+
+const determineCommunicatorType = (messages: any[]) => {
+  // Fun categories based on message patterns
+  const categories = [
+    'The Emoji Enthusiast 🎨',
+    'The Night Owl 🦉',
+    'The Morning Person ☀️',
+    'The Conversation Master 🎭',
+    'The Brief & Bold ⚡',
+    'The Storyteller 📚'
+  ];
+  
+  // Simple logic - can be made more sophisticated
+  const userMessages = messages.filter(m => m.sender === messages[0].sender);
+  const hasLotsOfEmojis = userMessages.some(m => (m.content.match(/[\p{Emoji}]/gu) || []).length > 3);
+  const avgMessageLength = userMessages.reduce((acc, m) => acc + m.content.length, 0) / userMessages.length;
+  const nightMessages = userMessages.filter(m => new Date(m.timestamp).getHours() >= 22).length;
+  const morningMessages = userMessages.filter(m => new Date(m.timestamp).getHours() <= 6).length;
+  
+  if (hasLotsOfEmojis) return categories[0];
+  if (nightMessages > userMessages.length * 0.3) return categories[1];
+  if (morningMessages > userMessages.length * 0.3) return categories[2];
+  if (userMessages.length > messages.length * 0.6) return categories[3];
+  if (avgMessageLength < 10) return categories[4];
+  return categories[5];
 };
