@@ -66,7 +66,7 @@ const Index = () => {
             <li>3. Scroll down and tap "Export Chat"</li>
             <li>4. Select "Without Media"</li>
             <li>5. Save the file and upload it here</li>
-            <li>6. You can use zip or txt format</li>
+            <li>6. Use zip. or txt. format</li>
           </ol>
         </div>
 
