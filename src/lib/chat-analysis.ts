@@ -1,3 +1,4 @@
+
 import { pipeline } from '@huggingface/transformers';
 
 // Type definitions for sentiment analysis
@@ -79,7 +80,6 @@ const initializeClassifier = async () => {
   if (!classifier) {
     console.log('Initializing sentiment analysis pipeline...');
     classifier = await pipeline('sentiment-analysis', 'Xenova/distilbert-base-uncased-finetuned-sst-2-english', {
-      quantized: true,
       progress_callback: (progress: any) => {
         console.log('Loading model:', Math.round(progress.progress * 100), '%');
       }
