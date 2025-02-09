@@ -5,9 +5,14 @@ import { PrivacyNotice } from "@/components/PrivacyNotice";
 const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-[#dcf8c6] to-[#25D366] py-12 px-4">
-      <div className="relative overflow-hidden w-full">
+      <div className="relative overflow-hidden w-full py-8">
         <div className="animate-[marquee_20s_linear_infinite] whitespace-nowrap">
-          <span className="inline-block text-[#075E54] text-3xl font-bold px-4">
+          <span className="inline-block text-[#FEF7CD] text-9xl font-bold px-4 text-center w-full tracking-wider" style={{ 
+            fontFamily: 'system-ui',
+            fontWeight: '900',
+            WebkitTextStroke: '2px #F97316',
+            textShadow: '4px 4px 0px #F97316'
+          }}>
             wrappedagain • wrappedagain • wrappedagain • wrappedagain • wrappedagain • 
             wrappedagain • wrappedagain • wrappedagain • wrappedagain • wrappedagain
           </span>
