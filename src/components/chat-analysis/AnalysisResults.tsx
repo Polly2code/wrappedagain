@@ -45,15 +45,18 @@ export const AnalysisResults = ({ showResults, setShowResults, analysisResults }
             <div className="space-y-2">
               <h3 className="font-semibold">Top Emojis</h3>
               <div className="flex flex-wrap gap-2">
-                {analysisResults.top_emojis.slice(0, 5).map(({ emoji, count }, index) => (
-                  <span 
-                    key={index} 
-                    className="px-3 py-2 bg-gray-100 rounded-md text-lg flex items-center gap-2"
-                  >
-                    <span className="text-2xl">{emoji}</span>
-                    <span className="text-gray-600">({count})</span>
-                  </span>
-                ))}
+                {[...analysisResults.top_emojis]
+                  .sort((a, b) => b.count - a.count)
+                  .slice(0, 5)
+                  .map(({ emoji, count }, index) => (
+                    <span 
+                      key={index} 
+                      className="px-3 py-2 bg-gray-100 rounded-md text-lg flex items-center gap-2"
+                    >
+                      <span className="text-2xl">{emoji}</span>
+                      <span className="text-gray-600">({count})</span>
+                    </span>
+                  ))}
               </div>
             </div>
           )}
