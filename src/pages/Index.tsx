@@ -45,7 +45,7 @@ const Index = () => {
       </div>
 
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-12 animate-fade-up">
+        <div className="text-center mt-8 mb-12 animate-fade-up">
           <h1 className="text-4xl font-bold mb-4 text-[#075E54]">
             Discover Your Chat Story
           </h1>
