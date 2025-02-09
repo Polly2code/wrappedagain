@@ -33,7 +33,7 @@ const AudioPlayer = () => {
   }, []);
 
   return (
-    <div className="fixed top-4 right-4 z-50">
+    <div className="fixed top-4 right-4 z-50 invisible">
       <iframe 
         id="soundcloud-player"
         width="300" 
