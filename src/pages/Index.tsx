@@ -50,7 +50,7 @@ const Index = () => {
             Discover Your Chat Story
           </h1>
           <p className="text-[#075E54]/90 max-w-md mx-auto">
-            Upload your WhatsApp chat export and get beautiful insights about your conversations, emoji usage, and chat patterns.
+            Upload your WhatsApp chat export and get beautiful insights about your conversations, emoji usage, and chat patterns
           </p>
         </div>
 
