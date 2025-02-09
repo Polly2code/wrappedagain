@@ -44,7 +44,7 @@ export const AnalysisResults = ({ showResults, setShowResults, analysisResults }
 
           <div className="space-y-2">
             <h3 className="font-semibold">Communication Style</h3>
-            <p>{analysisResults.communicator_type}</p>
+            <p className="text-lg">{analysisResults.communicator_type}</p>
           </div>
 
           {analysisResults.top_emojis.length > 0 && (
@@ -52,8 +52,12 @@ export const AnalysisResults = ({ showResults, setShowResults, analysisResults }
               <h3 className="font-semibold">Top Emojis</h3>
               <div className="flex flex-wrap gap-2">
                 {analysisResults.top_emojis.slice(0, 5).map(({ emoji, count }, index) => (
-                  <span key={index} className="px-2 py-1 bg-gray-100 rounded-md text-sm">
-                    {emoji} ({count})
+                  <span 
+                    key={index} 
+                    className="px-3 py-2 bg-gray-100 rounded-md text-lg flex items-center gap-2"
+                  >
+                    <span className="text-2xl">{emoji}</span>
+                    <span className="text-gray-600">({count})</span>
                   </span>
                 ))}
               </div>

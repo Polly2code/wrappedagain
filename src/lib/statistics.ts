@@ -21,19 +21,19 @@ export const calculateDayDistribution = (messages: Message[]) => {
 };
 
 export const calculateEmojiUsage = (messages: Message[]) => {
-  const emojiRegex = /[\p{Emoji}]/gu;
+  // More comprehensive emoji regex pattern
+  const emojiRegex = /[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F000}-\u{1F02F}\u{1F0A0}-\u{1F0FF}\u{1F100}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F900}-\u{1F9FF}]/gu;
   const emojiCounts: Record<string, number> = {};
   
   messages.forEach(msg => {
-    const emojis = msg.content.match(emojiRegex) || [];
-    emojis.forEach(emoji => {
+    const matches = msg.content.match(emojiRegex) || [];
+    matches.forEach(emoji => {
       emojiCounts[emoji] = (emojiCounts[emoji] || 0) + 1;
     });
   });
 
   return Object.entries(emojiCounts)
     .sort(([, a], [, b]) => b - a)
-    .slice(0, 10)
     .map(([emoji, count]) => ({ emoji, count }));
 };
 
