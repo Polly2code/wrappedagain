@@ -1,14 +1,34 @@
 
 import { FileUpload } from "@/components/FileUpload";
 import { PrivacyNotice } from "@/components/PrivacyNotice";
+import { useEffect } from "react";
 
 const Index = () => {
+  useEffect(() => {
+    const loadFont = async () => {
+      const font = new FontFace(
+        'Orbitron',
+        'url(https://fonts.gstatic.com/s/orbitron/v31/yMJMMIlzdpvBhQQL_SC3X9yhF25-T1nyKS6BoWgz.woff2)'
+      );
+
+      try {
+        await font.load();
+        document.fonts.add(font);
+        console.log('Orbitron font loaded successfully');
+      } catch (error) {
+        console.error('Error loading Orbitron font:', error);
+      }
+    };
+
+    loadFont();
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-[#dcf8c6] to-[#25D366] py-12 px-4">
       <div className="relative overflow-hidden w-full py-8">
         <div className="animate-[marquee_20s_linear_infinite] whitespace-nowrap">
           <span className="inline-block text-[#F4EF53] text-9xl font-bold px-4 text-center w-full tracking-wider" style={{ 
-            fontFamily: 'system-ui',
+            fontFamily: 'Orbitron, system-ui',
             fontWeight: '900',
             WebkitTextStroke: '3px #F97316',
             textShadow: `
