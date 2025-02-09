@@ -1,6 +1,7 @@
 
 import { FileUpload } from "@/components/FileUpload";
 import { PrivacyNotice } from "@/components/PrivacyNotice";
+import { AudioPlayer } from "@/components/AudioPlayer";
 import { useEffect } from "react";
 
 const Index = () => {
@@ -25,6 +26,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-[#dcf8c6] to-[#25D366] py-12 px-4">
+      <AudioPlayer />
       <div className="relative overflow-hidden w-full py-8">
         <div className="animate-[marquee_20s_linear_infinite] whitespace-nowrap">
           <span className="inline-block text-[#F4EF53] text-9xl font-bold px-4 text-center w-full tracking-wider" style={{ 
