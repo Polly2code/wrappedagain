@@ -5,25 +5,12 @@ import { Button } from '@/components/ui/button';
 import { DropZone } from './chat-analysis/DropZone';
 import { AnalysisResults } from './chat-analysis/AnalysisResults';
 import { processChat } from '@/lib/chat-analysis';
-
-type AnalysisResults = {
-  total_messages: number;
-  messages_sent: number;
-  messages_received: number;
-  time_distribution: Record<string, number>;
-  day_distribution: Record<string, number>;
-  top_emojis: Array<{ emoji: string; count: number }>;
-  sentiment_analysis: {
-    positive: number;
-    negative: number;
-  };
-  communicator_type: string;
-};
+import { ChatAnalysisResult } from '@/types/chat';
 
 export const FileUpload = () => {
   const [file, setFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [analysisResults, setAnalysisResults] = useState<AnalysisResults | null>(null);
+  const [analysisResults, setAnalysisResults] = useState<ChatAnalysisResult | null>(null);
   const [showResults, setShowResults] = useState(false);
 
   const handleSubmit = async () => {

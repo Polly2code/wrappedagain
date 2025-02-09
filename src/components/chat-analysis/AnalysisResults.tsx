@@ -1,5 +1,6 @@
 
 import { formatPercentage } from '@/lib/utils';
+import { ChatAnalysisResult } from '@/types/chat';
 import {
   Dialog,
   DialogContent,
@@ -10,19 +11,7 @@ import {
 export interface AnalysisResultsProps {
   showResults: boolean;
   setShowResults: (show: boolean) => void;
-  analysisResults: {
-    total_messages: number;
-    messages_sent: number;
-    messages_received: number;
-    time_distribution: Record<string, number>;
-    day_distribution: Record<string, number>;
-    top_emojis: Array<{ emoji: string; count: number }>;
-    sentiment_analysis: {
-      positive: number;
-      negative: number;
-    };
-    communication_styles: Record<string, string>;
-  } | null;
+  analysisResults: ChatAnalysisResult | null;
 }
 
 export const AnalysisResults = ({ showResults, setShowResults, analysisResults }: AnalysisResultsProps) => {
