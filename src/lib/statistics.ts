@@ -1,4 +1,3 @@
-
 import { Message } from './types/chat';
 
 export const calculateTimeDistribution = (messages: Message[]) => {
