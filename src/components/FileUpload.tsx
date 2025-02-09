@@ -12,6 +12,8 @@ export const FileUpload = () => {
 
   const processChat = async (fileContent: string) => {
     try {
+      console.log('Starting chat upload process...');
+      
       // Upload chat metadata
       const { data: uploadData, error: uploadError } = await supabase
         .from('chat_uploads')
@@ -21,7 +23,12 @@ export const FileUpload = () => {
         .select()
         .single();
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Error uploading chat metadata:', uploadError);
+        throw uploadError;
+      }
+
+      console.log('Chat metadata uploaded successfully:', uploadData);
 
       // Process messages
       const lines = fileContent.split('\n');
@@ -39,12 +46,19 @@ export const FileUpload = () => {
           };
         });
 
+      console.log(`Processing ${messages.length} messages...`);
+
       // Insert messages
       const { error: messagesError } = await supabase
         .from('messages')
         .insert(messages);
 
-      if (messagesError) throw messagesError;
+      if (messagesError) {
+        console.error('Error inserting messages:', messagesError);
+        throw messagesError;
+      }
+
+      console.log('Messages inserted successfully');
 
       // Calculate analysis
       const analysis = {
@@ -58,13 +72,19 @@ export const FileUpload = () => {
         communicator_type: determineCommunicatorType(messages),
       };
 
+      console.log('Uploading analysis results...');
+
       // Insert analysis results
       const { error: analysisError } = await supabase
         .from('analysis_results')
         .insert(analysis);
 
-      if (analysisError) throw analysisError;
+      if (analysisError) {
+        console.error('Error inserting analysis:', analysisError);
+        throw analysisError;
+      }
 
+      console.log('Analysis results uploaded successfully');
       toast.success('Chat analysis completed!');
       // Here you would typically redirect to the analysis results page
     } catch (error) {
