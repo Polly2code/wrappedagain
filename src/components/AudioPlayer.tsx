@@ -33,17 +33,18 @@ const AudioPlayer = () => {
   }, []);
 
   return (
-    <iframe
-      id="soundcloud-player"
-      title="SoundCloud Player"
-      width="300"
-      height="80"
-      scrolling="no"
-      frameBorder="no"
-      allow="autoplay"
-      className="fixed top-4 right-4 z-50 rounded-lg shadow-lg"
-      src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1519010947&auto_play=true&show_artwork=true&show_comments=false&show_user=false&show_reposts=false&visual=true"
-    />
+    <div className="fixed top-4 right-4 z-50">
+      <iframe 
+        id="soundcloud-player"
+        width="300" 
+        height="80" 
+        scrolling="no" 
+        frameBorder="no" 
+        allow="autoplay" 
+        className="rounded-lg shadow-lg"
+        src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1470306682&color=%23ff5500&auto_play=true&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"
+      />
+    </div>
   );
 };
 
