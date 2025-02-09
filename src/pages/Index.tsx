@@ -25,7 +25,7 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-[#dcf8c6] to-[#25D366] py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-white via-[#dcf8c6] to-[#25D366] py-12 px-4 fixed inset-0 overflow-auto">
       <AudioPlayer />
       <div className="relative overflow-hidden w-full py-8">
         <div className="animate-[marquee_20s_linear_infinite] whitespace-nowrap">
@@ -63,7 +63,7 @@ const Index = () => {
           <h3 className="font-bold text-[#075E54] mb-4">
             How to export your chat
           </h3>
-          <ol className="space-y-2">
+          <ol className="space-y-2 text-left pl-4">
             <li>1. Open WhatsApp and go to the chat</li>
             <li>2. Tap on the chat name at the top</li>
             <li>3. Scroll down and tap "Export Chat"</li>
@@ -81,4 +81,3 @@ const Index = () => {
 };
 
 export default Index;
-
