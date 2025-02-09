@@ -25,58 +25,36 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-[#dcf8c6] to-[#25D366] py-12 px-4">
-      <div className="fixed inset-0 flex items-center justify-center pointer-events-none">
-        <div className="relative w-[400vw] overflow-hidden">
-          <div className="absolute w-[400vw] flex animate-[marquee_20s_linear_infinite]">
-            <span className="inline-block w-[100vw] text-[#F4EF53] text-9xl font-bold text-center tracking-wider shrink-0" style={{ 
-              fontFamily: 'Orbitron, system-ui',
-              fontWeight: '900',
-              textShadow: `
-                -2px -2px 4px rgba(255, 255, 255, 0.8),
-                2px 2px 8px rgba(0, 0, 0, 0.15)
-              `,
-              filter: 'drop-shadow(0 10px 8px rgb(0 0 0 / 0.1))',
-            }}>
-              wrappedagainwrappedagainwrappedagain
-            </span>
-            <span className="inline-block w-[100vw] text-[#F4EF53] text-9xl font-bold text-center tracking-wider shrink-0" style={{ 
-              fontFamily: 'Orbitron, system-ui',
-              fontWeight: '900',
-              textShadow: `
-                -2px -2px 4px rgba(255, 255, 255, 0.8),
-                2px 2px 8px rgba(0, 0, 0, 0.15)
-              `,
-              filter: 'drop-shadow(0 10px 8px rgb(0 0 0 / 0.1))',
-            }}>
-              wrappedagainwrappedagainwrappedagain
-            </span>
-            <span className="inline-block w-[100vw] text-[#F4EF53] text-9xl font-bold text-center tracking-wider shrink-0" style={{ 
-              fontFamily: 'Orbitron, system-ui',
-              fontWeight: '900',
-              textShadow: `
-                -2px -2px 4px rgba(255, 255, 255, 0.8),
-                2px 2px 8px rgba(0, 0, 0, 0.15)
-              `,
-              filter: 'drop-shadow(0 10px 8px rgb(0 0 0 / 0.1))',
-            }}>
-              wrappedagainwrappedagainwrappedagain
-            </span>
-            <span className="inline-block w-[100vw] text-[#F4EF53] text-9xl font-bold text-center tracking-wider shrink-0" style={{ 
-              fontFamily: 'Orbitron, system-ui',
-              fontWeight: '900',
-              textShadow: `
-                -2px -2px 4px rgba(255, 255, 255, 0.8),
-                2px 2px 8px rgba(0, 0, 0, 0.15)
-              `,
-              filter: 'drop-shadow(0 10px 8px rgb(0 0 0 / 0.1))',
-            }}>
-              wrappedagainwrappedagainwrappedagain
-            </span>
-          </div>
+      <div className="relative overflow-hidden w-full py-8">
+        <div className="animate-[marquee_20s_linear_infinite] whitespace-nowrap">
+          <span className="inline-block text-[#F4EF53] text-9xl font-bold px-4 text-center w-full tracking-wider" style={{ 
+            fontFamily: 'Orbitron, system-ui',
+            fontWeight: '900',
+            textShadow: `
+              -2px -2px 4px rgba(255, 255, 255, 0.8),
+              2px 2px 8px rgba(0, 0, 0, 0.15)
+            `,
+            filter: 'drop-shadow(0 10px 8px rgb(0 0 0 / 0.1))',
+            transform: 'perspective(500px) rotateX(5deg)',
+          }}>
+            wrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagain
+          </span>
+          <span className="inline-block text-[#F4EF53] text-9xl font-bold px-4 text-center w-full tracking-wider" style={{ 
+            fontFamily: 'Orbitron, system-ui',
+            fontWeight: '900',
+            textShadow: `
+              -2px -2px 4px rgba(255, 255, 255, 0.8),
+              2px 2px 8px rgba(0, 0, 0, 0.15)
+            `,
+            filter: 'drop-shadow(0 10px 8px rgb(0 0 0 / 0.1))',
+            transform: 'perspective(500px) rotateX(5deg)',
+          }}>
+            wrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagain
+          </span>
         </div>
       </div>
 
-      <div className="relative max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12 animate-fade-up">
           <div className="inline-block px-4 py-1 bg-[#075E54]/10 backdrop-blur-sm rounded-full text-[#075E54] text-sm font-medium mb-4">
             WhatsApp Wrapped
