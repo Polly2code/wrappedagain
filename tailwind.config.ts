@@ -73,10 +73,19 @@ export default {
 						opacity: "1",
 					},
 				},
+				"marquee": {
+					"0%": {
+						transform: "translateX(100%)",
+					},
+					"100%": {
+						transform: "translateX(-100%)",
+					},
+				},
 			},
 			animation: {
 				"fade-up": "fade-up 0.5s ease-out",
 				"fade-in": "fade-in 0.3s ease-out",
+				"marquee": "marquee 20s linear infinite",
 			},
 		},
 	},
