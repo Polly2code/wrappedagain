@@ -1,9 +1,10 @@
+
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Upload, FileText } from 'lucide-react';
 import { toast } from 'sonner';
-import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
+import { pipeline } from '@huggingface/transformers';
 
 export const FileUpload = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -11,27 +12,9 @@ export const FileUpload = () => {
 
   const processChat = async (fileContent: string) => {
     try {
-      console.log('Starting chat upload process...');
+      console.log('Starting chat analysis...');
       
-      // Upload chat metadata
-      const { data: uploadData, error: uploadError } = await supabase
-        .from('chat_uploads')
-        .insert([{
-          file_name: file?.name,
-          upload_date: new Date().toISOString(),
-        }])
-        .select('*')
-        .single();
-
-      if (uploadError) {
-        console.error('Error uploading chat metadata:', uploadError);
-        toast.error('Failed to upload chat metadata');
-        return;
-      }
-
-      console.log('Chat metadata uploaded successfully:', uploadData);
-
-      // Process messages
+      // Parse messages
       const lines = fileContent.split('\n');
       const messagePattern = /\[(\d{2}\/\d{2}\/\d{2}, \d{2}:\d{2}:\d{2})\] ([^:]+): (.*)/;
       const messages = lines
@@ -40,7 +23,6 @@ export const FileUpload = () => {
           const [, timestamp, sender, content] = line.match(messagePattern) || [];
           const date = timestamp.replace(/(\d{2})\/(\d{2})\/(\d{2})/, '20$3-$2-$1');
           return {
-            chat_upload_id: uploadData.id,
             sender,
             content,
             timestamp: new Date(date).toISOString(),
@@ -50,55 +32,46 @@ export const FileUpload = () => {
 
       console.log(`Processing ${messages.length} messages...`);
 
-      // Insert messages in smaller batches to avoid payload size limits
-      const batchSize = 100;
-      for (let i = 0; i < messages.length; i += batchSize) {
-        const batch = messages.slice(i, i + batchSize);
-        const { error: messagesError } = await supabase
-          .from('messages')
-          .insert(batch)
-          .select();
+      // Initialize sentiment analysis pipeline
+      const classifier = await pipeline('sentiment-analysis', 'Xenova/distilbert-base-uncased-finetuned-sst-2-english');
 
-        if (messagesError) {
-          console.error(`Error inserting messages batch ${i}:`, messagesError);
-          toast.error('Failed to insert messages');
-          return;
-        }
-      }
+      // Analyze sentiment for a sample of messages
+      const sampleSize = Math.min(100, messages.length);
+      const sampleMessages = messages
+        .sort(() => 0.5 - Math.random())
+        .slice(0, sampleSize);
 
-      console.log('Messages inserted successfully');
+      const sentiments = await Promise.all(
+        sampleMessages.map(async (msg) => {
+          const result = await classifier(msg.content);
+          return result[0];
+        })
+      );
 
       // Calculate analysis
       const analysis = {
-        chat_upload_id: uploadData.id,
         total_messages: messages.length,
         messages_sent: messages.filter(m => m.sender === messages[0].sender).length,
         messages_received: messages.filter(m => m.sender !== messages[0].sender).length,
         time_distribution: calculateTimeDistribution(messages),
         day_distribution: calculateDayDistribution(messages),
         top_emojis: calculateEmojiUsage(messages),
+        sentiment_analysis: {
+          positive: sentiments.filter(s => s.label === 'POSITIVE').length / sampleSize,
+          negative: sentiments.filter(s => s.label === 'NEGATIVE').length / sampleSize,
+        },
         communicator_type: determineCommunicatorType(messages),
       };
 
-      console.log('Uploading analysis results...');
-
-      // Insert analysis results
-      const { error: analysisError } = await supabase
-        .from('analysis_results')
-        .insert([analysis])
-        .select();
-
-      if (analysisError) {
-        console.error('Error inserting analysis:', analysisError);
-        toast.error('Failed to save analysis results');
-        return;
-      }
-
-      console.log('Analysis results uploaded successfully');
+      console.log('Analysis results:', analysis);
       toast.success('Chat analysis completed!');
+      
+      // Here you could add state management to display the results
+      // or navigate to a results page
+
     } catch (error) {
       console.error('Error processing chat:', error);
-      toast.error('Error processing chat file');
+      toast.error('Error analyzing chat file');
     } finally {
       setIsProcessing(false);
     }
@@ -164,7 +137,7 @@ export const FileUpload = () => {
           </div>
           <div>
             {isProcessing ? (
-              <p className="font-medium">Processing your chat...</p>
+              <p className="font-medium">Analyzing your chat...</p>
             ) : file ? (
               <>
                 <p className="text-sm font-medium">{file.name}</p>
@@ -189,7 +162,7 @@ export const FileUpload = () => {
         disabled={!file || isProcessing}
         className="w-full"
       >
-        {isProcessing ? 'Processing...' : 'Analyze Chat'}
+        {isProcessing ? 'Analyzing...' : 'Analyze Chat'}
       </Button>
     </div>
   );
@@ -233,7 +206,6 @@ const calculateEmojiUsage = (messages: any[]) => {
 };
 
 const determineCommunicatorType = (messages: any[]) => {
-  // Fun categories based on message patterns
   const categories = [
     'The Emoji Enthusiast 🎨',
     'The Night Owl 🦉',
@@ -243,7 +215,6 @@ const determineCommunicatorType = (messages: any[]) => {
     'The Storyteller 📚'
   ];
   
-  // Simple logic - can be made more sophisticated
   const userMessages = messages.filter(m => m.sender === messages[0].sender);
   const hasLotsOfEmojis = userMessages.some(m => (m.content.match(/[\p{Emoji}]/gu) || []).length > 3);
   const avgMessageLength = userMessages.reduce((acc, m) => acc + m.content.length, 0) / userMessages.length;
