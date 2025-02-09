@@ -7,11 +7,18 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-white via-[#dcf8c6] to-[#25D366] py-12 px-4">
       <div className="relative overflow-hidden w-full py-8">
         <div className="animate-[marquee_20s_linear_infinite] whitespace-nowrap">
-          <span className="inline-block text-[#FEF7CD] text-9xl font-bold px-4 text-center w-full tracking-wider" style={{ 
+          <span className="inline-block text-[#F4EF53] text-9xl font-bold px-4 text-center w-full tracking-wider" style={{ 
             fontFamily: 'system-ui',
             fontWeight: '900',
-            WebkitTextStroke: '2px #F97316',
-            textShadow: '4px 4px 0px #F97316'
+            WebkitTextStroke: '3px #F97316',
+            textShadow: `
+              4px 4px 0px #F97316,
+              8px 8px 16px rgba(249, 115, 22, 0.3),
+              -2px -2px 4px rgba(255, 255, 255, 0.8),
+              2px 2px 8px rgba(0, 0, 0, 0.15)
+            `,
+            filter: 'drop-shadow(0 10px 8px rgb(0 0 0 / 0.1))',
+            transform: 'perspective(500px) rotateX(5deg)',
           }}>
             wrappedagain • wrappedagain • wrappedagain • wrappedagain • wrappedagain • 
             wrappedagain • wrappedagain • wrappedagain • wrappedagain • wrappedagain
