@@ -10,7 +10,6 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -30,9 +29,9 @@ serve(async (req) => {
     let systemPrompt;
     if (analysis_type === 'communication_style') {
       const senders = [...new Set(messages.map(msg => msg.sender))];
-      systemPrompt = `You are a chat style analyzer. Given chat messages, analyze the communication style of each participant. Evaluate aspects like formality, emoji usage, message length, response time, and conversation patterns. Return a JSON object with 'communication_styles' containing communication style descriptions for each participant, like {"communication_styles": {"${senders[0]}": "The Professional Communicator 👔: Uses formal language, responds promptly", "${senders[1]}": "The Emoji Enthusiast 🎨: Expressive and visual communication style"}}`;
+      systemPrompt = `Analyze the communication style of each participant in this chat. Return a simple JSON object with communication styles. The response should be in this exact format without any markdown or code blocks: {"communication_styles":{"${senders[0]}":"Brief description of style","${senders[1]}":"Brief description of style"}}`;
     } else {
-      systemPrompt = 'You are an emoji analyzer. Given chat messages, extract and count the most frequently used emojis. Return exactly 5 emojis with their counts in JSON format like [{"emoji": "😊", "count": 5}]. If there are fewer than 5 emojis, include all found emojis. If no emojis are found, return an empty array.';
+      systemPrompt = 'Extract and count emojis from the chat. Return a simple JSON array without any markdown or code blocks, like: [{"emoji":"😊","count":5}]. Return exactly 5 emojis with their counts. If fewer emojis exist, return all found. If no emojis found, return empty array.';
     }
 
     const requestBody = {
@@ -78,12 +77,25 @@ serve(async (req) => {
       throw new Error('Invalid response format from Langdock');
     }
 
-    const analysisResult = JSON.parse(data.choices[0].message.content);
-    console.log('Parsed analysis result:', analysisResult);
+    // Clean up the response by removing any markdown code block syntax
+    const cleanContent = data.choices[0].message.content
+      .replace(/```json\n?/g, '')
+      .replace(/```\n?/g, '')
+      .trim();
 
-    return new Response(JSON.stringify(analysisResult), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    console.log('Cleaned content:', cleanContent);
+
+    try {
+      const analysisResult = JSON.parse(cleanContent);
+      console.log('Parsed analysis result:', analysisResult);
+      return new Response(JSON.stringify(analysisResult), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    } catch (parseError) {
+      console.error('JSON parsing error:', parseError);
+      console.error('Content that failed to parse:', cleanContent);
+      throw new Error(`Failed to parse GPT response as JSON: ${parseError.message}`);
+    }
   } catch (error) {
     console.error('Error in analysis:', error);
     return new Response(JSON.stringify({ 
