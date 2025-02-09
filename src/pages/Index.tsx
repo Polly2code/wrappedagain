@@ -59,11 +59,11 @@ const Index = () => {
 
         <FileUpload />
         
-        <div className="mt-12 text-center text-sm text-[#075E54]/80 animate-fade-up backdrop-blur-sm rounded-xl p-6">
+        <div className="mt-12 mx-auto max-w-md text-center text-sm text-[#075E54]/80 animate-fade-up backdrop-blur-sm rounded-xl p-6">
           <h3 className="font-bold text-[#075E54] mb-4">
             How to export your chat
           </h3>
-          <ol className="space-y-2 text-left pl-4">
+          <ol className="space-y-2 text-left w-fit mx-auto">
             <li>1. Open WhatsApp and go to the chat</li>
             <li>2. Tap on the chat name at the top</li>
             <li>3. Scroll down and tap "Export Chat"</li>
