@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Upload, FileText } from 'lucide-react';
@@ -41,10 +40,14 @@ export const FileUpload = () => {
         .sort(() => 0.5 - Math.random())
         .slice(0, sampleSize);
 
+      type SentimentResult = { label: string; score: number; };
+      
       const sentiments = await Promise.all(
         sampleMessages.map(async (msg) => {
           const result = await classifier(msg.content);
-          return result[0];
+          // Ensure we're handling both single result and array result cases
+          const sentimentResult = Array.isArray(result) ? result[0] : result;
+          return sentimentResult as SentimentResult;
         })
       );
 
@@ -66,9 +69,6 @@ export const FileUpload = () => {
       console.log('Analysis results:', analysis);
       toast.success('Chat analysis completed!');
       
-      // Here you could add state management to display the results
-      // or navigate to a results page
-
     } catch (error) {
       console.error('Error processing chat:', error);
       toast.error('Error analyzing chat file');
