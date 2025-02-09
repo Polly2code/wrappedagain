@@ -4,6 +4,7 @@ import { useDropzone } from 'react-dropzone';
 import { Upload, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
+import { Button } from '@/components/ui/button';
 
 export const FileUpload = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -78,22 +79,28 @@ export const FileUpload = () => {
     const uploadedFile = acceptedFiles[0];
     if (uploadedFile?.name.endsWith('.txt')) {
       setFile(uploadedFile);
-      setIsProcessing(true);
-      
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        const text = e.target?.result;
-        if (typeof text === 'string') {
-          await processChat(text);
-        }
-      };
-      reader.readAsText(uploadedFile);
-      
       toast.success('Chat file uploaded successfully!');
     } else {
       toast.error('Please upload a valid WhatsApp chat export file (.txt)');
     }
   }, []);
+
+  const handleSubmit = async () => {
+    if (!file) {
+      toast.error('Please select a file first');
+      return;
+    }
+
+    setIsProcessing(true);
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const text = e.target?.result;
+      if (typeof text === 'string') {
+        await processChat(text);
+      }
+    };
+    reader.readAsText(file);
+  };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ 
     onDrop,
@@ -104,7 +111,7 @@ export const FileUpload = () => {
   });
 
   return (
-    <div className="w-full max-w-md mx-auto">
+    <div className="w-full max-w-md mx-auto space-y-4">
       <div
         {...getRootProps()}
         className={`p-8 border-2 border-dashed rounded-xl transition-all duration-200 ease-in-out animate-fade-up
@@ -147,6 +154,14 @@ export const FileUpload = () => {
           </div>
         </div>
       </div>
+      
+      <Button 
+        onClick={handleSubmit}
+        disabled={!file || isProcessing}
+        className="w-full"
+      >
+        {isProcessing ? 'Processing...' : 'Analyze Chat'}
+      </Button>
     </div>
   );
 };
