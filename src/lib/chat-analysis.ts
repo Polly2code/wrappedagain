@@ -65,21 +65,56 @@ export const processChat = async (fileContent: string) => {
   try {
     console.log('Starting chat analysis...');
     
-    // Parse messages
+    // Parse messages - Updated regex pattern to match WhatsApp format more reliably
     const lines = fileContent.split('\n');
-    const messagePattern = /\[(\d{2}\/\d{2}\/\d{2}, \d{2}:\d{2}:\d{2})\] ([^:]+): (.*)/;
+    const messagePattern = /\[?(\d{1,2}\/\d{1,2}\/\d{2,4},?\s*\d{1,2}:\d{2}(?::\d{2})?(?:\s*[AaPp][Mm])?)\]?\s*[-:]?\s*([^:]+?):\s*(.*)/;
+    
     const messages = lines
-      .filter(line => messagePattern.test(line))
+      .filter(line => {
+        const isValid = messagePattern.test(line);
+        if (!isValid && line.trim().length > 0) {
+          console.log('Non-matching line:', line);
+        }
+        return isValid;
+      })
       .map(line => {
-        const [, timestamp, sender, content] = line.match(messagePattern) || [];
-        const date = timestamp.replace(/(\d{2})\/(\d{2})\/(\d{2})/, '20$3-$2-$1');
+        const match = line.match(messagePattern);
+        if (!match) return null;
+        
+        const [, timestamp, sender, content] = match;
+        
+        // Convert various date formats to ISO string
+        let date = new Date();
+        try {
+          // Try parsing the date directly
+          const [datePart, timePart] = timestamp.split(',');
+          const [day, month, year] = datePart.split('/');
+          const fullYear = year.length === 2 ? '20' + year : year;
+          const timeComponents = timePart.trim().split(':');
+          const hours = parseInt(timeComponents[0]);
+          const minutes = parseInt(timeComponents[1]);
+          const seconds = timeComponents[2] ? parseInt(timeComponents[2]) : 0;
+          
+          date = new Date(
+            parseInt(fullYear),
+            parseInt(month) - 1,
+            parseInt(day),
+            hours,
+            minutes,
+            seconds
+          );
+        } catch (error) {
+          console.error('Error parsing date:', timestamp, error);
+        }
+
         return {
-          sender,
-          content,
-          timestamp: new Date(date).toISOString(),
+          sender: sender.trim(),
+          content: content.trim(),
+          timestamp: date.toISOString(),
           has_emoji: /[\p{Emoji}]/u.test(content),
         };
-      });
+      })
+      .filter((msg): msg is NonNullable<typeof msg> => msg !== null);
 
     console.log(`Processing ${messages.length} messages...`);
 
@@ -96,13 +131,17 @@ export const processChat = async (fileContent: string) => {
     
     const sentiments = await Promise.all(
       sampleMessages.map(async (msg) => {
-        const result = await classifier(msg.content);
-        const sentimentResult = Array.isArray(result) ? result[0] : result;
-        return sentimentResult as SentimentResult;
+        try {
+          const result = await classifier(msg.content);
+          const sentimentResult = Array.isArray(result) ? result[0] : result;
+          return sentimentResult as SentimentResult;
+        } catch (error) {
+          console.error('Error analyzing sentiment for message:', msg.content, error);
+          return { label: 'NEUTRAL', score: 0.5 };
+        }
       })
     );
 
-    // Calculate analysis
     return {
       total_messages: messages.length,
       messages_sent: messages.filter(m => m.sender === messages[0].sender).length,
