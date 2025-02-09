@@ -35,18 +35,11 @@ export const AnalysisResults = ({ showResults, setShowResults, analysisResults }
           <DialogTitle>Chat Analysis Results</DialogTitle>
         </DialogHeader>
         <div className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <h3 className="font-semibold">Message Stats</h3>
-              <p>Total Messages: {analysisResults.total_messages}</p>
-              <p>Messages Sent: {analysisResults.messages_sent}</p>
-              <p>Messages Received: {analysisResults.messages_received}</p>
-            </div>
-            <div className="space-y-2">
-              <h3 className="font-semibold">Sentiment Analysis</h3>
-              <p>Positive: {formatPercentage(analysisResults.sentiment_analysis.positive)}</p>
-              <p>Negative: {formatPercentage(analysisResults.sentiment_analysis.negative)}</p>
-            </div>
+          <div className="space-y-2">
+            <h3 className="font-semibold">Message Stats</h3>
+            <p>Total Messages: {analysisResults.total_messages}</p>
+            <p>Messages Sent: {analysisResults.messages_sent}</p>
+            <p>Messages Received: {analysisResults.messages_received}</p>
           </div>
 
           <div className="space-y-2">
@@ -58,7 +51,7 @@ export const AnalysisResults = ({ showResults, setShowResults, analysisResults }
             <div className="space-y-2">
               <h3 className="font-semibold">Top Emojis</h3>
               <div className="flex flex-wrap gap-2">
-                {analysisResults.top_emojis.map(({ emoji, count }, index) => (
+                {analysisResults.top_emojis.slice(0, 5).map(({ emoji, count }, index) => (
                   <span key={index} className="px-2 py-1 bg-gray-100 rounded-md text-sm">
                     {emoji} ({count})
                   </span>
@@ -66,18 +59,6 @@ export const AnalysisResults = ({ showResults, setShowResults, analysisResults }
               </div>
             </div>
           )}
-
-          <div className="space-y-2">
-            <h3 className="font-semibold">Activity by Day</h3>
-            <div className="grid grid-cols-2 gap-2">
-              {Object.entries(analysisResults.day_distribution).map(([day, count]) => (
-                <div key={day} className="flex justify-between">
-                  <span>{day}:</span>
-                  <span>{count} messages</span>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </DialogContent>
     </Dialog>
