@@ -7,7 +7,7 @@ const AudioPlayer = () => {
   const [isMuted, setIsMuted] = useState(false);
 
   useEffect(() => {
-    // Initialize SoundCloud Widget API
+    // Initialize SoundCloud Widget API using HTTPS
     const script = document.createElement('script');
     script.src = 'https://w.soundcloud.com/player/api.js';
     script.async = true;
