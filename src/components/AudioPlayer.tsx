@@ -49,12 +49,12 @@ const AudioPlayer = () => {
           variant="outline"
           size="icon"
           onClick={handleMuteToggle}
-          className="bg-white/80 backdrop-blur-sm hover:bg-white/90"
+          className="bg-primary/10 backdrop-blur-sm hover:bg-primary/20"
         >
           {isMuted ? (
-            <VolumeX className="h-5 w-5" />
+            <VolumeX className="h-5 w-5 text-primary" />
           ) : (
-            <Volume2 className="h-5 w-5" />
+            <Volume2 className="h-5 w-5 text-primary" />
           )}
         </Button>
       </div>
