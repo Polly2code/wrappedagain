@@ -19,7 +19,7 @@ export const AnalysisResults = ({ showResults, setShowResults, analysisResults }
 
   return (
     <Dialog open={showResults} onOpenChange={setShowResults}>
-      <DialogContent className="max-w-2xl bg-gradient-to-br from-white via-[#dcf8c6] to-[#25D366]">
+      <DialogContent className="max-w-2xl bg-gradient-to-br from-white via-primary/20 to-primary">
         <DialogHeader>
           <DialogTitle>Chat Analysis Results</DialogTitle>
         </DialogHeader>
@@ -62,3 +62,4 @@ export const AnalysisResults = ({ showResults, setShowResults, analysisResults }
     </Dialog>
   );
 };
+
