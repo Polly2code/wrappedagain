@@ -33,6 +33,7 @@ const Index = () => {
         <span className="text-[#F4EF53] text-9xl font-bold" style={{ 
           fontFamily: 'Orbitron, system-ui',
           fontWeight: '900',
+          fontStyle: 'italic',
           textShadow: `
             -2px -2px 4px rgba(255, 255, 255, 0.8),
             2px 2px 8px rgba(0, 0, 0, 0.15)
