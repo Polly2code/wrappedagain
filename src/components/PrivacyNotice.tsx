@@ -9,7 +9,7 @@ export const PrivacyNotice = () => {
           <ShieldCheck className="w-5 h-5 text-primary" />
         </div>
         <div>
-          <h3 className="font-medium text-base">GDPR Conform</h3>
+          <h3 className="font-medium text-base">Hosted in EU</h3>
           <p className="text-sm text-gray-600 mt-1">
             Hosted in Europe, fully compliant with EU data protection regulations
           </p>
