@@ -1,4 +1,3 @@
-
 import { FileUpload } from "@/components/FileUpload";
 import { PrivacyNotice } from "@/components/PrivacyNotice";
 import AudioPlayer from "@/components/AudioPlayer";
@@ -32,7 +31,6 @@ const Index = () => {
           <div 
             className="flex animate-[marquee_20s_linear_infinite] whitespace-nowrap"
             style={{
-              animationDirection: 'reverse',
               willChange: 'transform'
             }}
           >
@@ -58,7 +56,6 @@ const Index = () => {
           <div 
             className="flex animate-[marquee_20s_linear_infinite] whitespace-nowrap"
             style={{
-              animationDirection: 'reverse',
               willChange: 'transform'
             }}
           >
