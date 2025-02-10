@@ -30,12 +30,13 @@ const Index = () => {
       <div className="relative overflow-hidden w-full py-8">
         <div className="flex whitespace-nowrap">
           <div 
-            className="flex animate-[marquee_20s_linear_infinite] whitespace-nowrap"
+            className="animate-[marquee_20s_linear_infinite] flex"
             style={{
-              willChange: 'transform'
+              willChange: 'transform',
+              transform: 'translateX(100%)'
             }}
           >
-            {[...Array(4)].map((_, i) => (
+            {[...Array(8)].map((_, i) => (
               <span 
                 key={i}
                 className="inline-block text-[#F4EF53] text-9xl font-bold text-center tracking-wider" 
@@ -55,12 +56,13 @@ const Index = () => {
             ))}
           </div>
           <div 
-            className="flex animate-[marquee_20s_linear_infinite] whitespace-nowrap"
+            className="animate-[marquee_20s_linear_infinite] flex"
             style={{
-              willChange: 'transform'
+              willChange: 'transform',
+              transform: 'translateX(100%)'
             }}
           >
-            {[...Array(4)].map((_, i) => (
+            {[...Array(8)].map((_, i) => (
               <span 
                 key={`copy-${i}`}
                 className="inline-block text-[#F4EF53] text-9xl font-bold text-center tracking-wider" 
