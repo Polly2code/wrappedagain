@@ -40,7 +40,7 @@ const Index = () => {
             transform: 'perspective(500px)',
           }}>
             <span style={{ display: 'inline-block', transform: 'skewX(-15deg)' }}>
-              wrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagain
+              wrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagain
             </span>
           </span>
         </div>
