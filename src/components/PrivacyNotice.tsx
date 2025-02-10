@@ -11,7 +11,7 @@ export const PrivacyNotice = () => {
         <div>
           <h3 className="font-medium text-base">Hosted in EU</h3>
           <p className="text-sm text-gray-600 mt-1">
-            Compliant with EU data protection regulations
+            No user data being stored
           </p>
         </div>
       </div>
