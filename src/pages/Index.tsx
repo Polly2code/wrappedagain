@@ -24,14 +24,12 @@ const Index = () => {
     loadFont();
   }, []);
 
-  const repeatedText = "wrappedagain".repeat(1000);
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-[#dcf8c6] to-[#25D366] py-12 px-4 fixed inset-0 overflow-auto">
       <AudioPlayer />
       <div className="relative overflow-hidden w-full py-8">
-        <div className="flex whitespace-nowrap" style={{ animation: 'scroll 60s linear infinite' }}>
-          <span className="inline-block text-[#F4EF53] text-9xl font-bold px-4 text-center w-full tracking-[.25em]" style={{ 
+        <div className="animate-[marquee_7s_linear_infinite] whitespace-nowrap">
+          <span className="inline-block text-[#F4EF53] text-9xl font-bold px-4 text-center w-full tracking-wider" style={{ 
             fontFamily: 'Orbitron, system-ui',
             fontWeight: '900',
             textShadow: `
@@ -42,21 +40,7 @@ const Index = () => {
             transform: 'perspective(500px)',
           }}>
             <span style={{ display: 'inline-block', transform: 'skewX(-15deg)' }}>
-              {repeatedText}
-            </span>
-          </span>
-          <span className="inline-block text-[#F4EF53] text-9xl font-bold px-4 text-center w-full tracking-[.25em]" style={{ 
-            fontFamily: 'Orbitron, system-ui',
-            fontWeight: '900',
-            textShadow: `
-              -2px -2px 4px rgba(255, 255, 255, 0.8),
-              2px 2px 8px rgba(0, 0, 0, 0.15)
-            `,
-            filter: 'drop-shadow(0 10px 8px rgb(0 0 0 / 0.1))',
-            transform: 'perspective(500px)',
-          }}>
-            <span style={{ display: 'inline-block', transform: 'skewX(-15deg)' }}>
-              {repeatedText}
+              wrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagain
             </span>
           </span>
         </div>
