@@ -3,7 +3,7 @@ import { ShieldCheck, Flag } from 'lucide-react';
 
 export const PrivacyNotice = () => {
   return (
-    <div className="w-full max-w-md mx-auto mt-4 p-6 rounded-xl animate-fade-up backdrop-blur-sm">
+    <div className="w-full max-w-md mx-auto mt-12 p-6 rounded-xl animate-fade-up backdrop-blur-sm">
       <div className="flex items-start gap-4">
         <div className="p-2 rounded-full bg-primary/10">
           <ShieldCheck className="w-5 h-5 text-primary" />
@@ -30,3 +30,4 @@ export const PrivacyNotice = () => {
     </div>
   );
 };
+
