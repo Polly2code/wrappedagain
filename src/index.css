@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -102,13 +103,13 @@
 
 .marquee-scroll-container {
   position: fixed;
-  top: 50%;
+  top: 0;
   left: 50%;
   width: 100%;
-  transform: translate(-50%,-50%);
+  transform: translateX(-50%);
   display: flex;
   pointer-events: none;
-  z-index: 5;
+  z-index: 50;
   will-change: transform;
 }
 
