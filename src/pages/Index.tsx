@@ -28,19 +28,59 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-white via-[#dcf8c6] to-[#25D366] py-12 px-4 fixed inset-0 overflow-auto">
       <AudioPlayer />
       <div className="relative overflow-hidden w-full py-8">
-        <div className="animate-[marquee_7s_linear_infinite] whitespace-nowrap">
-          <span className="inline-block text-[#F4EF53] text-9xl font-bold px-4 text-center w-full tracking-wider" style={{ 
-            fontFamily: 'Orbitron, system-ui',
-            fontWeight: '900',
-            textShadow: `
-              -2px -2px 4px rgba(255, 255, 255, 0.8),
-              2px 2px 8px rgba(0, 0, 0, 0.15)
-            `,
-            filter: 'drop-shadow(0 10px 8px rgb(0 0 0 / 0.1))',
-            transform: 'perspective(500px) rotateX(5deg)',
-          }}>
-            wrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagain
-          </span>
+        <div className="flex space-x-4">
+          <div className="animate-[marquee_20s_linear_infinite] whitespace-nowrap flex">
+            <span className="inline-block text-[#F4EF53] text-9xl font-bold px-4 text-center tracking-wider" style={{ 
+              fontFamily: 'Orbitron, system-ui',
+              fontWeight: '900',
+              textShadow: `
+                -2px -2px 4px rgba(255, 255, 255, 0.8),
+                2px 2px 8px rgba(0, 0, 0, 0.15)
+              `,
+              filter: 'drop-shadow(0 10px 8px rgb(0 0 0 / 0.1))',
+              transform: 'perspective(500px) rotateX(5deg)',
+            }}>
+              wrappedagain
+            </span>
+            <span className="inline-block text-[#F4EF53] text-9xl font-bold px-4 text-center tracking-wider" style={{ 
+              fontFamily: 'Orbitron, system-ui',
+              fontWeight: '900',
+              textShadow: `
+                -2px -2px 4px rgba(255, 255, 255, 0.8),
+                2px 2px 8px rgba(0, 0, 0, 0.15)
+              `,
+              filter: 'drop-shadow(0 10px 8px rgb(0 0 0 / 0.1))',
+              transform: 'perspective(500px) rotateX(5deg)',
+            }}>
+              wrappedagain
+            </span>
+          </div>
+          <div className="animate-[marquee_20s_linear_infinite] whitespace-nowrap flex absolute left-full top-0">
+            <span className="inline-block text-[#F4EF53] text-9xl font-bold px-4 text-center tracking-wider" style={{ 
+              fontFamily: 'Orbitron, system-ui',
+              fontWeight: '900',
+              textShadow: `
+                -2px -2px 4px rgba(255, 255, 255, 0.8),
+                2px 2px 8px rgba(0, 0, 0, 0.15)
+              `,
+              filter: 'drop-shadow(0 10px 8px rgb(0 0 0 / 0.1))',
+              transform: 'perspective(500px) rotateX(5deg)',
+            }}>
+              wrappedagain
+            </span>
+            <span className="inline-block text-[#F4EF53] text-9xl font-bold px-4 text-center tracking-wider" style={{ 
+              fontFamily: 'Orbitron, system-ui',
+              fontWeight: '900',
+              textShadow: `
+                -2px -2px 4px rgba(255, 255, 255, 0.8),
+                2px 2px 8px rgba(0, 0, 0, 0.15)
+              `,
+              filter: 'drop-shadow(0 10px 8px rgb(0 0 0 / 0.1))',
+              transform: 'perspective(500px) rotateX(5deg)',
+            }}>
+              wrappedagain
+            </span>
+          </div>
         </div>
       </div>
 
