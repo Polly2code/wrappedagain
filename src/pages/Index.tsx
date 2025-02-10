@@ -37,9 +37,11 @@ const Index = () => {
               2px 2px 8px rgba(0, 0, 0, 0.15)
             `,
             filter: 'drop-shadow(0 10px 8px rgb(0 0 0 / 0.1))',
-            transform: 'perspective(500px) rotateX(5deg)',
+            transform: 'perspective(500px)',
           }}>
-            wrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagain
+            <span style={{ display: 'inline-block', transform: 'skewX(-15deg)' }}>
+              wrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagain
+            </span>
           </span>
         </div>
       </div>
