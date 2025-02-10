@@ -30,7 +30,7 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-white via-[#dcf8c6] to-[#25D366] py-12 px-4 overflow-auto">
       <AudioPlayer />
       <div className="marquee-scroll-container mb-12">
-        <span className="text-[#F4EF53] text-9xl font-bold" style={{ 
+        <span className="text-[#F4EF53] text-7xl font-bold" style={{ 
           fontFamily: 'Orbitron, system-ui',
           fontWeight: '900',
           fontStyle: 'italic',
