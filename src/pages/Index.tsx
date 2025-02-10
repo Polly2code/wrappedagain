@@ -29,7 +29,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-[#dcf8c6] to-[#25D366] py-12 px-4 overflow-auto">
       <AudioPlayer />
-      <div className="marquee-scroll-container">
+      <div className="marquee-scroll-container mb-12">
         <span className="text-[#F4EF53] text-9xl font-bold" style={{ 
           fontFamily: 'Orbitron, system-ui',
           fontWeight: '900',
@@ -45,7 +45,7 @@ const Index = () => {
       </div>
 
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mt-8 mb-12 animate-fade-up">
+        <div className="text-center mb-12 animate-fade-up">
           <h1 className="text-4xl font-bold mb-4 text-[#075E54]">
             Discover Your Chat Story
           </h1>
