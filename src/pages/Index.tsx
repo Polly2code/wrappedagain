@@ -27,7 +27,7 @@ const Index = () => {
   const repeatedText = "wrappedagain".repeat(1000);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-[#dcf8c6] to-[#25D366] py-12 px-4 fixed inset-0 overflow-auto">
+    <div className="min-h-screen bg-gradient-to-br from-white via-[#dcf8c6] to-[#25D366] py-12 px-4 overflow-auto">
       <AudioPlayer />
       <div className="marquee-scroll-container">
         <span className="text-[#F4EF53] text-9xl font-bold" style={{ 
