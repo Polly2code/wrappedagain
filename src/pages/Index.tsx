@@ -30,7 +30,7 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-white via-[#dcf8c6] to-[#25D366] py-12 px-4 overflow-auto">
       <AudioPlayer />
       <div className="marquee-scroll-container mb-12">
-        <span className="text-[#F4EF53] text-9xl font-bold" style={{ 
+        <span className="text-[#F4EF53] text-7xl font-bold" style={{ 
           fontFamily: 'Orbitron, system-ui',
           fontWeight: '900',
           fontStyle: 'italic',
@@ -40,7 +40,8 @@ const Index = () => {
             2px 2px 8px rgba(0, 0, 0, 0.15)
           `,
           filter: 'drop-shadow(0 10px 8px rgb(0 0 0 / 0.1))',
-          animation: 'marquee 3667s linear infinite'
+          animation: 'marquee 3667s linear infinite',
+          transform: 'translateX(100%)'
         }}>
           {repeatedText}
         </span>

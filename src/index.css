@@ -88,16 +88,13 @@
   backface-visibility: hidden;
   text-transform: uppercase;
   will-change: transform;
-  transform: translateX(0);
   white-space: nowrap;
-  animation: marquee 11s linear infinite;
 }
 
 @keyframes marquee {
   0% {
-    transform: translateX(0);
+    transform: translateX(100%);
   }
-
   100% {
     transform: translateX(-100%);
   }
