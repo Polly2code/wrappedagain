@@ -1,3 +1,4 @@
+
 import { FileUpload } from "@/components/FileUpload";
 import { PrivacyNotice } from "@/components/PrivacyNotice";
 import AudioPlayer from "@/components/AudioPlayer";
@@ -37,6 +38,7 @@ const Index = () => {
             2px 2px 8px rgba(0, 0, 0, 0.15)
           `,
           filter: 'drop-shadow(0 10px 8px rgb(0 0 0 / 0.1))',
+          animation: 'marquee 110s linear infinite'
         }}>
           {repeatedText}
         </span>
