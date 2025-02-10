@@ -40,7 +40,7 @@ const Index = () => {
             2px 2px 8px rgba(0, 0, 0, 0.15)
           `,
           filter: 'drop-shadow(0 10px 8px rgb(0 0 0 / 0.1))',
-          animation: 'marquee 2750s linear infinite'
+          animation: 'marquee 5500s linear infinite'
         }}>
           {repeatedText}
         </span>
