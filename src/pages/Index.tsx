@@ -28,8 +28,8 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-white via-[#dcf8c6] to-[#25D366] py-12 px-4 fixed inset-0 overflow-auto">
       <AudioPlayer />
       <div className="relative overflow-hidden w-full py-8">
-        <div className="animate-[marquee_7s_linear_infinite] whitespace-nowrap">
-          <span className="inline-block text-[#F4EF53] text-9xl font-bold px-4 text-center w-full tracking-wider" style={{ 
+        <div className="animate-[marquee_120s_linear_infinite] whitespace-nowrap">
+          <span className="inline-block text-[#F4EF53] text-9xl font-bold px-4 text-center w-full tracking-wider italic" style={{ 
             fontFamily: 'Orbitron, system-ui',
             fontWeight: '900',
             textShadow: `
@@ -37,7 +37,7 @@ const Index = () => {
               2px 2px 8px rgba(0, 0, 0, 0.15)
             `,
             filter: 'drop-shadow(0 10px 8px rgb(0 0 0 / 0.1))',
-            transform: 'perspective(500px) rotateX(5deg)',
+            transform: 'perspective(500px) rotateX(5deg) rotate(-15deg)',
           }}>
             wrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagain
           </span>
