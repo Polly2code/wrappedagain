@@ -1,3 +1,4 @@
+
 import { FileUpload } from "@/components/FileUpload";
 import { PrivacyNotice } from "@/components/PrivacyNotice";
 import AudioPlayer from "@/components/AudioPlayer";
@@ -37,7 +38,7 @@ const Index = () => {
             {[...Array(4)].map((_, i) => (
               <span 
                 key={i}
-                className="inline-block text-[#F4EF53] text-9xl font-bold px-4 text-center tracking-wider" 
+                className="inline-block text-[#F4EF53] text-9xl font-bold text-center tracking-wider" 
                 style={{ 
                   fontFamily: 'Orbitron, system-ui',
                   fontWeight: '900',
@@ -62,7 +63,7 @@ const Index = () => {
             {[...Array(4)].map((_, i) => (
               <span 
                 key={`copy-${i}`}
-                className="inline-block text-[#F4EF53] text-9xl font-bold px-4 text-center tracking-wider" 
+                className="inline-block text-[#F4EF53] text-9xl font-bold text-center tracking-wider" 
                 style={{ 
                   fontFamily: 'Orbitron, system-ui',
                   fontWeight: '900',
