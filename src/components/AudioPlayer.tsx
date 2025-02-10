@@ -8,7 +8,6 @@ const AudioPlayer = () => {
   const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
-    // Initialize SoundCloud Widget API using HTTPS
     const script = document.createElement('script');
     script.src = 'https://w.soundcloud.com/player/api.js';
     script.async = true;
@@ -51,12 +50,16 @@ const AudioPlayer = () => {
   return (
     <>
       {!isPlaying && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm touch-none"
+          role="presentation"
+        >
           <Button
             variant="outline"
             size="icon"
             onClick={handlePlayClick}
-            className="w-32 h-32 rounded-full bg-primary/10 backdrop-blur-sm hover:bg-primary/20 transition-all duration-300 hover:scale-110"
+            className="w-32 h-32 rounded-full bg-primary/10 backdrop-blur-sm hover:bg-primary/20 transition-all duration-300 hover:scale-110 active:scale-95 touch-auto"
+            aria-label="Play audio"
           >
             <Play className="h-16 w-16 text-primary" />
           </Button>
@@ -68,7 +71,8 @@ const AudioPlayer = () => {
           variant="outline"
           size="icon"
           onClick={handleMuteToggle}
-          className="bg-primary/10 backdrop-blur-sm hover:bg-primary/20"
+          className="bg-primary/10 backdrop-blur-sm hover:bg-primary/20 active:scale-95 touch-auto"
+          aria-label={isMuted ? "Unmute" : "Mute"}
         >
           {isMuted ? (
             <VolumeX className="h-5 w-5 text-primary" />
@@ -95,3 +99,4 @@ const AudioPlayer = () => {
 };
 
 export default AudioPlayer;
+
