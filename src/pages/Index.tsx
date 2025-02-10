@@ -30,7 +30,7 @@ const Index = () => {
       <div className="relative overflow-hidden w-full py-8">
         <div className="flex whitespace-nowrap">
           <div 
-            className="animate-[marquee_60s_linear_infinite] flex"
+            className="animate-[marquee_120s_linear_infinite] flex"
             style={{
               willChange: 'transform',
               transform: 'translateX(100%)'
@@ -56,7 +56,7 @@ const Index = () => {
             ))}
           </div>
           <div 
-            className="animate-[marquee_60s_linear_infinite] flex"
+            className="animate-[marquee_120s_linear_infinite] flex"
             style={{
               willChange: 'transform',
               transform: 'translateX(100%)'
