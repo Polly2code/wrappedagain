@@ -24,30 +24,30 @@ const Index = () => {
     loadFont();
   }, []);
 
-  const repeatedText = "wrappedagain".repeat(1000);
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-[#dcf8c6] to-[#25D366] py-12 px-4 overflow-auto">
+    <div className="min-h-screen bg-gradient-to-br from-white via-[#dcf8c6] to-[#25D366] py-12 px-4 fixed inset-0 overflow-auto">
       <AudioPlayer />
-      <div className="marquee-scroll-container mb-12">
-        <span className="text-[#F4EF53] text-9xl font-bold" style={{ 
-          fontFamily: 'Orbitron, system-ui',
-          fontWeight: '900',
-          fontStyle: 'italic',
-          letterSpacing: '0.1em',
-          textShadow: `
-            -2px -2px 4px rgba(255, 255, 255, 0.8),
-            2px 2px 8px rgba(0, 0, 0, 0.15)
-          `,
-          filter: 'drop-shadow(0 10px 8px rgb(0 0 0 / 0.1))',
-          animation: 'marquee 3667s linear infinite'
-        }}>
-          {repeatedText}
-        </span>
+      <div className="relative overflow-hidden w-full py-8">
+        <div className="animate-[marquee_7s_linear_infinite] whitespace-nowrap">
+          <span className="inline-block text-[#F4EF53] text-9xl font-bold px-4 text-center w-full tracking-wider" style={{ 
+            fontFamily: 'Orbitron, system-ui',
+            fontWeight: '900',
+            textShadow: `
+              -2px -2px 4px rgba(255, 255, 255, 0.8),
+              2px 2px 8px rgba(0, 0, 0, 0.15)
+            `,
+            filter: 'drop-shadow(0 10px 8px rgb(0 0 0 / 0.1))',
+            transform: 'perspective(500px)',
+          }}>
+            <span style={{ display: 'inline-block', transform: 'skewX(-15deg)' }}>
+              wrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagainwrappedagain
+            </span>
+          </span>
+        </div>
       </div>
 
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-12 animate-fade-up">
+        <div className="text-center mt-8 mb-12 animate-fade-up">
           <h1 className="text-4xl font-bold mb-4 text-[#075E54]">
             Discover Your Chat Story
           </h1>
