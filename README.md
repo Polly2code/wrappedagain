@@ -1,8 +1,8 @@
-# Wrapped Again
+# WrappedAgain
 
 Discover your WhatsApp chat story. 
 Upload your WhatsApp chat export and get beautiful insights about your conversations, emoji usage, and chat patterns. 
-Visit the web app here: https://wrappedagain.lovable.app/
+Visit the web app [here](https://wrappedagain.lovable.app/).
 
 ## 📋 Prerequisites
 
@@ -14,7 +14,7 @@ Before you begin, ensure you have the following installed:
 
 1. Clone the repository:
 ```bash
-git clone [your-repository-url]
+git clone https://github.com/Polly2code/wrappedagain.git
 cd wrappedagain
 ```
 
@@ -50,16 +50,6 @@ To build for production:
 npm run build
 # or
 bun run build
-```
-
-## 🧪 Linting
-
-To run the linter:
-
-```bash
-npm run lint
-# or
-bun run lint
 ```
 
 ## 📦 Production Preview
