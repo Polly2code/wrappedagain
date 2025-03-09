@@ -1,69 +1,80 @@
-# Welcome to your Lovable project
+# Wrapped Again
 
-## Project info
+Discover your WhatsApp chat story. 
+Upload your WhatsApp chat export and get beautiful insights about your conversations, emoji usage, and chat patterns. 
+Visit the web app here: https://wrappedagain.lovable.app/
 
-**URL**: https://lovable.dev/projects/3a9696e6-7b20-4c01-be01-250922f8157e
+## 📋 Prerequisites
 
-## How can I edit this code?
+Before you begin, ensure you have the following installed:
+- Node.js (v18 or higher)
+- npm or bun package manager
 
-There are several ways of editing your application.
+## 🛠 Installation
 
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/3a9696e6-7b20-4c01-be01-250922f8157e) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+1. Clone the repository:
+```bash
+git clone [your-repository-url]
+cd wrappedagain
 ```
 
-**Edit a file directly in GitHub**
+2. Install dependencies:
+```bash
+npm install
+# or if using bun
+bun install
+```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+3. Set up environment variables:
+Create a `.env` file in the root directory and add your Supabase configuration:
+```env
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
 
-**Use GitHub Codespaces**
+## 🚀 Running the Application
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+To run the application in development mode:
 
-## What technologies are used for this project?
+```bash
+npm run dev
+# or
+bun dev
+```
 
-This project is built with .
+The application will start on `http://localhost:5173` (or another port if 5173 is occupied).
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+To build for production:
 
-## How can I deploy this project?
+```bash
+npm run build
+# or
+bun run build
+```
 
-Simply open [Lovable](https://lovable.dev/projects/3a9696e6-7b20-4c01-be01-250922f8157e) and click on Share -> Publish.
+## 🧪 Linting
 
-## I want to use a custom domain - is that possible?
+To run the linter:
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+```bash
+npm run lint
+# or
+bun run lint
+```
+
+## 📦 Production Preview
+
+To preview the production build locally:
+
+```bash
+npm run preview
+# or
+bun run preview
+```
+
+## 🏗 Project Structure
+
+- `/src` - Source code
+- `/public` - Static assets
+- `/supabase` - Supabase configuration and functions
+- `/components` - Reusable UI components
